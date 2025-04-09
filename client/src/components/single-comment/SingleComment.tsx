@@ -1,30 +1,25 @@
-import { useAuth } from '@/Context/AuthContext'
 import { Comment } from '@/types/Comment'
 import React from 'react'
-import { BsTrash2 } from 'react-icons/bs'
 
 function SingleComment({ comment, onDelete }: { comment: Comment, onDelete: (commentId: string) => void }) {
-    const { user } = useAuth()
     return (
-        <div className="flex items-center gap-2 p-2 border-b">
-            {/* Avatar */}
-            <img
-                src={"https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"}
-                alt="Avatar"
-                className="w-8 h-8 rounded-full object-cover"
-            />
-
-            {/* Comment Content */}
-            <div className="flex-1">
-                <span className="font-bold">{"username"}</span>:<span className='pl-3'>{comment.text}</span>
+        <div className='h-10 px-3'>
+            <div className="flex items-center">
+                <div className="shrink-0">
+                    <img className="w-8 h-8 rounded-full" src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D" />
+                </div>
+                <div className="flex-1 min-w-0 ms-4">
+                    <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
+                        Michael Gough
+                    </p>
+                    <p className="text-sm text-gray-500 truncate dark:text-gray-400">
+                        {comment.text}
+                    </p>
+                </div>
+                <div onClick={() => onDelete} className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                    $67
+                </div>
             </div>
-
-            {/* Delete Button (only if the user is the author) */}
-            {comment.user === user?._id && (
-                <button onClick={() => onDelete(comment._id)} className="text-red-500 hover:text-red-700">
-                    <BsTrash2 className='cursor-pointer' size={18} />
-                </button>
-            )}
         </div>
     )
 }
