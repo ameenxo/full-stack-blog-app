@@ -236,3 +236,40 @@ export const fetchUserProfile = async (): Promise<ApiResponse<User>> => {
     };
   }
 };
+export const UpdateUserProfile = async (data: {
+  fullName: string;
+  bio: string;
+  country: string;
+  avatar: File;
+}): Promise<ApiResponse<User>> => {
+  try {
+    const response = await axios.patch(
+      "http://localhost:2025/user/profile",
+      { updates: data },
+      { withCredentials: true }
+    );
+    if (response.status === 200 && !response.data.error) return response.data;
+    else {
+      throw new ApiError(
+        response.data.message || "Failed to update user profile",
+        true
+      );
+    }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return {
+        error: true,
+        message: error.message,
+      };
+    } else if (axios.isAxiosError(error)) {
+      return {
+        error: true,
+        message: error.response?.data.message || "Failed To Delete  Blog ",
+      };
+    }
+    return {
+      error: true,
+      message: "An unexpected error occurred when Deleting  the Blog",
+    };
+  }
+};
