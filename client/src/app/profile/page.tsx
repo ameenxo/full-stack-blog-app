@@ -1,38 +1,37 @@
 "use client"
-import React, { } from 'react'
-import { useAuth } from '@/Context/AuthContext'
-import UserInfo from '@/components/user-info/UserInfo'
-import AuthError from '@/components/error/AuthError'
-// import { User } from '@/types/user'
-// import { useBlog } from '@/Context/BlogContext'
-// import BlogList from '@/components/blog-list/BlogList'
-interface user {
-  username: string,
-  avatar: string,
-  bio: string,
-  date: string,
-}
-const userInfo: user = {
-  avatar: "https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg",
-  bio: "Hey there! I love blogging and sharing my thoughts.",
-  username: "Ameen Xo",
-  date: "10 / 25 / 2022",
-
-}
-function Page() {
-  const { user } = useAuth()
-  // const { allBlogs } = useBlog()
+import { useAuth } from '@/Context/AuthContext';
+import { useBlog } from '@/Context/BlogContext';
+import { Blog } from '@/types/blog';
+import React from 'react'
 
 
-  if (!user) return <AuthError error={"Cannot Find User"} />
-  // const userBlogs = allBlogs.filter(blog => blog.author === user._id);
+export default function ProfilePage() {
+  const { user } = useAuth();
+  const { allBlogs } = useBlog()
+  const userBlogs = allBlogs.filter((blog: Blog) => blog.author === user?._id);
 
+
+  if (!user)
+    return <div>user not logged in please logg in </div>
 
   return (
-    <div className='mt-20 mb-20'>
-      <UserInfo user={userInfo} />
+    <div>
+      <h2>User Profile</h2>
+      <p>Full Name: {user?.username}</p>
+      <p>Bio: {user.bio}</p>
+      <p>Country: {user.country}</p>
+      <h2>User Blogs</h2>
+      {userBlogs.length === 0 ? (
+        <p>No blogs found.</p>
+      ) : (
+        userBlogs.map((blog) => (
+          <div key={blog._id}>
+            <p>{blog.title}</p>
+            <p>{blog.content}</p>
+          </div>
+        ))
+      )}
     </div>
   )
 }
 
-export default Page
