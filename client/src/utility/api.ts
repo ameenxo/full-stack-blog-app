@@ -2,6 +2,7 @@ import axios from "axios";
 import { ApiError } from "./error";
 import { ApiResponse } from "@/types/api-response";
 import { Blog } from "@/types/blog";
+import { User } from "@/types/user";
 
 export const toggleLike = async (
   blogId: string
@@ -204,3 +205,34 @@ export const deleteBlog = async (
   }
 };
 
+export const fetchUserProfile = async (): Promise<ApiResponse<User>> => {
+  try {
+    const response = await axios.get("http://localhost:2025/user/profile", {
+      withCredentials: true,
+    });
+    if (response.status === 200 && !response.data.error) {
+      return response.data;
+    } else {
+      throw new ApiError(
+        response.data.message || "Failed to fetch user profile",
+        true
+      );
+    }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return {
+        error: true,
+        message: error.message,
+      };
+    } else if (axios.isAxiosError(error)) {
+      return {
+        error: true,
+        message: error.response?.data.message || "Failed To Delete  Blog ",
+      };
+    }
+    return {
+      error: true,
+      message: "An unexpected error occurred when Deleting  the Blog",
+    };
+  }
+};
