@@ -49,7 +49,7 @@ userSchema.pre('save', async function (next) {
     this.bio = `Hey there! I'm ${this.name}. I'm excited to share my thoughts with you.`
   }
   if (!this.avatar) {
-    this.avatar = "https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg"
+    this.avatar = "http://localhost:2025/images/default.jpg"
   }
   next();
 })
@@ -67,7 +67,7 @@ userSchema.statics.createUser = async function (username, email, password, fullN
   try {
     const saltRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltRound);
-    const newUser = await this.create({ username, email, name: fullName, password: hashedPassword,});
+    const newUser = await this.create({ username, email, name: fullName, password: hashedPassword, });
     return newUser;
   } catch (error) {
     throw new CustomError(error.message, 404, "not getting exact error");
@@ -114,6 +114,19 @@ userSchema.statics.getUserProfile = async function (userId) {
     }
     return user;
   } catch (error) {
+    throw new CustomError(error.message || "error in getUserProfile : form userModel", error.statusCode || 401, error.errorCode)
+  }
+}
+userSchema.statics.updateUserProfile = async function (userId, updateObject) {
+  try {
+    const updatedUser = await this.findByIdAndUpdate(userId, {
+      $set: updateObject
+    }, { new: true });
+    if (!updatedUser) {
+      throw new CustomError("user not found", 404, "user not found");
+    }
+    return updatedUser;
+  } catch {
     throw new CustomError(error.message || "error in getUserProfile : form userModel", error.statusCode || 401, error.errorCode)
   }
 }

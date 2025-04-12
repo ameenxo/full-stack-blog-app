@@ -9,7 +9,7 @@ function validateRegisterBody(req, res, next) {
                 if (!req.body.username || !req.body.password || !req.body.email || !req.body.fullName) {
                         throw new CustomError("required field are empty", 402, 'bad request');
                 }
-                const { username, email, password,fullName } = req.body;
+                const { username, email, password, fullName } = req.body;
                 if (!username || typeof username !== "string" || username.trim().length < 3) {
                         throw new CustomError("Username must be at least 3 characters long.", 402, "bad input at username")
                 }
@@ -96,5 +96,53 @@ function validateDeleteCommentBody(req, res, next) {
                 return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in validating login body");
         }
 }
+function validateUpdateProfileBody(req, res, next) {
+        const allowedProperties = ['fullName', 'bio', 'country'];
+        const updates = req.body.updates;
+        try {
+                if (!updates || Object.keys(updates).length === 0) {
+                        throw new CustomError('No updates provided', 400, 'bad request');
+                }
+                for (const property in updates) {
+                        if (!allowedProperties.includes(property)) {
+                                throw new CustomError(`Invalid property: ${property}. Only fullName, bio, and country are allowed`, 400, 'bad request');
+                        }
+                }
+                if (updates.fullName && typeof updates.fullName !== 'string') {
+                        throw new CustomError('Full name must be a string', 400, 'bad request');
+                }
+                if (updates.bio && typeof updates.bio !== 'string') {
+                        throw new CustomError('Bio must be a string', 400, 'bad request');
+                }
+                if (updates.country && typeof updates.country !== 'string') {
+                        throw new CustomError('Country must be a string', 400, 'bad request');
+                }
+                next();
+        } catch (error) {
+                if (req.file) {
+                        deleteImage(req.file.path);
+                }
+                return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error in validating update profile body");
+        }
+}
+function validateImageFile(req, res, next) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
-module.exports = { createBlogBody, validateRegisterBody, validateLoginBody, getOneBlogBody, validateDeleteBody, validateCommentBody, validateDeleteCommentBody }
+        try {
+                if (!req.file) {
+                        req.isFileFound = false
+                        return next(); // No file provided, proceed with next middleware
+                }
+                if (!allowedTypes.includes(req.file.mimetype)) {
+                        throw new CustomError('Invalid file type. Only JPEG, PNG, and GIF are allowed', 400, 'bad request');
+                }
+                req.isFileFound = true
+                next();
+        } catch (error) {
+                if (req.file) {
+                        deleteImage(req.file.path)
+                }
+                return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error in validating Avatar body");
+        }
+}
+module.exports = { createBlogBody, validateRegisterBody, validateLoginBody, getOneBlogBody, validateDeleteBody, validateCommentBody, validateDeleteCommentBody, validateUpdateProfileBody, validateImageFile }

@@ -8,7 +8,7 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const blogRoute = require('./routes/blog-Routes/blog.js');
 const path = require('path')
-const {authorization} = require('./middleware/authMiddleware.js')
+const { authorization } = require('./middleware/authMiddleware.js');
 
 
 app.use(express.json())
@@ -19,7 +19,7 @@ app.use(cors({
 app.use(cookieParser())
 app.use('/user', AuthRoute);
 app.use('/blog', blogRoute);
-app.use("/uploads", authorization,express.static(path.join(__dirname, "uploads")));
+app.use('/images', authorization, express.static(path.join(__dirname, 'images')));
 app.use(express.urlencoded({
     extended: true
 
