@@ -98,5 +98,16 @@ userSchema.statics.generateToken = async function (user) {
     throw new CustomError(error.message || "error in token generation process", error.statusCode || 401, error.errorCode)
   }
 }
+userSchema.statics.getUserProfile = async function (userId) {
+  try {
+    const user = await this.findById(userId).select('-password');
+    if (!user) {
+      throw new CustomError("user not found", 404, "user not found");
+    }
+    return user;
+  } catch (error) {
+    throw new CustomError(error.message || "error in getUserProfile : form userModel", error.statusCode || 401, error.errorCode)
+  }
+}
 const User = mongoose.model('user', userSchema);
 module.exports = User;

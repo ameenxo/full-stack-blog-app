@@ -3,6 +3,7 @@ const { validateRegisterBody, validateLoginBody } = require('../../middleware/va
 const { checkUserExist, createUser, authenticateUser, generateToken } = require('../../middleware/authMiddleware');
 const { authorization } = require('../../middleware/authMiddleware');
 const sendResponse = require('../../utility/sendResponse');
+const { getUserProfile } = require('../../middleware/userUtils');
 
 
 const AuthRoute = express.Router();
@@ -36,5 +37,12 @@ AuthRoute.get('/me', authorization, (req, res) => {
     return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in authorization process");
   }
 });
+AuthRoute.get('/profile', authorization, getUserProfile, (req, res) => {
+  try {
+    return sendResponse(res, 200, false, "successfully fetched user profile ", res.data);
+  } catch (error) {
+    return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in fetching profile process");
+  }
+})
 
 module.exports = AuthRoute

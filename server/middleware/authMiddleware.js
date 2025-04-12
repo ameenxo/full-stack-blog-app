@@ -41,26 +41,6 @@ async function authorization(req, res, next) {
                     next();
 
             }
-            // else if (req.method === "DELETE" && req.params.blogId && req.params.commentId) {
-            //     console.log("working else if  statement");
-
-            //     const blog = await Blog.getOne(req.params.blogId);
-            //     if (!blog) {
-            //         throw new CustomError("Blog not found", 404, "Blog not found");
-            //     }
-
-            //     // Find the comment
-            //     const comment = blog.comments.find(c => c._id.toString() === req.params.commentId);
-            //     if (!comment) {
-            //         throw new CustomError("Comment not found", 404, "Comment not found");
-            //     }
-
-            //     // Check if the logged-in user is the comment author
-            //     if (comment.user.toString() !== req.user.id) {
-            //         throw new CustomError("Unauthorized access, you are not the author of this comment", 403, "Forbidden");
-            //     }
-            //     return next(); // Comment author is authorized
-            // }
             else
                 next();
 
