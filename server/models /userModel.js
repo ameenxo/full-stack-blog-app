@@ -9,6 +9,11 @@ const userSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
   email: {
     type: String,
     required: true,
@@ -23,6 +28,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     require: false,
     default: "https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg"
+  },
+  bio: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  country: {
+    type: String,
+    required: false,
+    trim: true
   },
   createdAt: {
     type: Date,
