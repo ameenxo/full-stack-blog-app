@@ -1,7 +1,11 @@
 import { Comment } from '@/types/Comment'
 import React from 'react'
+import DeleteComment from '../delete-comment/DeleteComment'
+import EmptyComment from '../empty-comment/EmptyComment'
 
-function SingleComment({ comment, onDelete }: { comment: Comment, onDelete: (commentId: string) => void }) {
+function SingleComment({ comment, onDelete, blogAuthor }: { blogAuthor: string, comment: Comment, onDelete: (commentId: string) => void }) {
+    if (!comment) return <EmptyComment />
+
     return (
         <div className='h-10 px-3'>
             <div className="flex items-center">
@@ -16,8 +20,8 @@ function SingleComment({ comment, onDelete }: { comment: Comment, onDelete: (com
                         {comment.text}
                     </p>
                 </div>
-                <div onClick={() => onDelete} className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                    $67
+                <div className="inline-flex items-center text-base font-semibold text-red-600 hover:cursor-pointer">
+                    <DeleteComment blogAuthor={blogAuthor} commentId={comment._id} onDelete={onDelete} commentAuthor={comment.user} />
                 </div>
             </div>
         </div>
