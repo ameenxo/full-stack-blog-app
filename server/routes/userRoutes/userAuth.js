@@ -8,7 +8,7 @@ const { getUserProfile } = require('../../middleware/userUtils');
 
 const AuthRoute = express.Router();
 
-AuthRoute.post('/register', validateRegisterBody, checkUserExist, createUser, (req, res) => {
+AuthRoute.post('/register',validateRegisterBody, checkUserExist, createUser, (req, res) => {
   return sendResponse(res, 200, false, "successfully created an account",);
 });
 AuthRoute.post('/login', validateLoginBody, authenticateUser, generateToken, (req, res) => {

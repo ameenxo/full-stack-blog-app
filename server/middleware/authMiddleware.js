@@ -64,7 +64,7 @@ async function checkUserExist(req, res, next) {
 };
 async function createUser(req, res, next) {
     try {
-        const newUser = await User.createUser(req.body.username, req.body.email, req.body.password);
+        const newUser = await User.createUser(req.body.username, req.body.email, req.body.password,req.body.fullName);
         if (!newUser) {
             throw new CustomError("registration failed please try again ", 401, "cannot get any idea ")
         }
@@ -72,7 +72,7 @@ async function createUser(req, res, next) {
         next()
 
     } catch (error) {
-        return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in authorization process");
+        return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error. from createUser middleware");
     }
 }
 async function authenticateUser(req, res, next) {

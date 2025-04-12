@@ -6,10 +6,10 @@ const deleteImage = require('../utility/deleteImage');
 function validateRegisterBody(req, res, next) {
 
         try {
-                if (!req.body.username || !req.body.password || !req.body.email) {
+                if (!req.body.username || !req.body.password || !req.body.email || !req.body.fullName) {
                         throw new CustomError("required field are empty", 402, 'bad request');
                 }
-                const { username, email, password } = req.body;
+                const { username, email, password,fullName } = req.body;
                 if (!username || typeof username !== "string" || username.trim().length < 3) {
                         throw new CustomError("Username must be at least 3 characters long.", 402, "bad input at username")
                 }
@@ -23,7 +23,7 @@ function validateRegisterBody(req, res, next) {
                         next();
                 }
         } catch (error) {
-                return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in authorization process");
+                return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error");
         }
 
 }

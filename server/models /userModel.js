@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     require: false,
-    default: "https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg"
   },
   bio: {
     type: String,
@@ -45,6 +44,15 @@ const userSchema = new mongoose.Schema({
   }
 
 });
+userSchema.pre('save', async function (next) {
+  if (!this.bio) {
+    this.bio = `Hey there! I'm ${this.name}. I'm excited to share my thoughts with you.`
+  }
+  if (!this.avatar) {
+    this.avatar = "https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small_2x/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg"
+  }
+  next();
+})
 userSchema.statics.isUserExist = async function (username, email) {
   if (!username || !email) {
     throw new CustomError("please provide some email and password to check exist user", 401, "")
@@ -55,11 +63,11 @@ userSchema.statics.isUserExist = async function (username, email) {
   return !!user;
 
 };
-userSchema.statics.createUser = async function (username, email, password) {
+userSchema.statics.createUser = async function (username, email, password, fullName) {
   try {
     const saltRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltRound);
-    const newUser = await this.create({ username, email, password: hashedPassword });
+    const newUser = await this.create({ username, email, name: fullName, password: hashedPassword,});
     return newUser;
   } catch (error) {
     throw new CustomError(error.message, 404, "not getting exact error");
