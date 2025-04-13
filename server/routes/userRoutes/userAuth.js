@@ -15,7 +15,7 @@ AuthRoute.post('/register', validateRegisterBody, checkUserExist, createUser, (r
 AuthRoute.post('/login', validateLoginBody, authenticateUser, generateToken, (req, res) => {
   try {
     res.cookie('token', res.token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-    return sendResponse(res, 200, false, "your successfully log in", res.user);
+    return sendResponse(res, 200, false, "your successfully log in", res.data);
   } catch (error) {
     return sendResponse(res, error.statusCode, true, error.message);
   }

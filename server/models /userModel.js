@@ -45,6 +45,9 @@ const userSchema = new mongoose.Schema({
 
 });
 userSchema.pre('save', async function (next) {
+  if (!this.country) {
+    this.country = "India"
+  }
   if (!this.bio) {
     this.bio = `Hey there! I'm ${this.name}. I'm excited to share my thoughts with you.`
   }
@@ -86,14 +89,22 @@ userSchema.statics.authenticateUser = async function (nameOrEmail, password) {
     if (!passwordIsValid) {
       throw new CustomError("password is not valid ", 401, "password is not valid");
     }
-    else
-      return user
+    else {
+      const userData = await this.findById(user._id).select('-password');
+      if (!userData) {
+        throw new CustomError("user not found", 404, "user not found");
+      }
+      return userData;
+    }
+
   } catch (error) {
     throw new CustomError(error.message || "error in authentication process", error.statusCode || 401, error.errorCode)
   }
 }
 userSchema.statics.generateToken = async function (user) {
   try {
+    console.log(user);
+
     if (!user) {
       throw new CustomError("cannot generate token without user", 403, "cannot generate token without user")
     }
