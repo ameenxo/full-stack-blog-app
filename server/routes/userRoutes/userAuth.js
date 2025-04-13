@@ -30,9 +30,9 @@ AuthRoute.post('/logout', (req, res) => {
 
   }
 });
-AuthRoute.get('/me', authorization, (req, res) => {
+AuthRoute.get('/me', authorization, getUserProfile, (req, res) => {
   try {
-    return sendResponse(res, 200, false, "your successfully authorized", req.user);
+    return sendResponse(res, 200, false, "your successfully authorized", res.data);
 
   } catch (error) {
     return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in authorization process");
