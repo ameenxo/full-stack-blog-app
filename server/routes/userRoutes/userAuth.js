@@ -3,7 +3,7 @@ const { validateRegisterBody, validateLoginBody, validateUpdateProfileBody, vali
 const { checkUserExist, createUser, authenticateUser, generateToken } = require('../../middleware/authMiddleware');
 const { authorization } = require('../../middleware/authMiddleware');
 const sendResponse = require('../../utility/sendResponse');
-const { getUserProfile, UpdateUserProfile } = require('../../middleware/userUtils');
+const { getUserProfile, UpdateUserProfile, DeleteUserAvatar } = require('../../middleware/userUtils');
 const upload = require('../../middleware/uploadImages');
 
 
@@ -45,7 +45,7 @@ AuthRoute.get('/profile', authorization, getUserProfile, (req, res) => {
     return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in fetching profile process");
   }
 });
-AuthRoute.patch('/profile', authorization, upload.single('avatar'), validateImageFile, validateUpdateProfileBody, UpdateUserProfile, (req, res) => {
+AuthRoute.patch('/profile', authorization, upload.single('avatar'), validateImageFile, validateUpdateProfileBody, DeleteUserAvatar,UpdateUserProfile, (req, res) => {
   try {
     return sendResponse(res, 200, false, "successfully updated user profile ", res.data);
   } catch {

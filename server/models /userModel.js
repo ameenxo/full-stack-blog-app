@@ -103,7 +103,6 @@ userSchema.statics.authenticateUser = async function (nameOrEmail, password) {
 }
 userSchema.statics.generateToken = async function (user) {
   try {
-    console.log(user);
 
     if (!user) {
       throw new CustomError("cannot generate token without user", 403, "cannot generate token without user")

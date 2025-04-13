@@ -98,7 +98,7 @@ function validateDeleteCommentBody(req, res, next) {
 }
 function validateUpdateProfileBody(req, res, next) {
         const allowedProperties = ['fullName', 'bio', 'country'];
-        const updates = req.body.updates;
+        const updates = req.body;
         try {
                 if (!updates || Object.keys(updates).length === 0) {
                         throw new CustomError('No updates provided', 400, 'bad request');
