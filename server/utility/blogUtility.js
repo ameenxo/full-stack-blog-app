@@ -1,6 +1,6 @@
 const Blog = require("../models /blogModel");
 
-async function getImageFileNameById(blogId) {
+async function getImageFileNameById(blogId,blogOrUser) {
     try {
         const blog = await Blog.getOne(blogId)
         if (!blog) {
@@ -14,4 +14,5 @@ async function getImageFileNameById(blogId) {
     }
 
 }
+
 module.exports = { getImageFileNameById }

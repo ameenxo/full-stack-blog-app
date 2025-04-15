@@ -33,7 +33,6 @@ AuthRoute.post('/logout', authenticateUser, (req, res) => {
 AuthRoute.get('/me', authorization, getUserProfile, (req, res) => {
   try {
     return sendResponse(res, 200, false, "your successfully authorized", res.data);
-
   } catch (error) {
     return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in authorization process");
   }
@@ -45,7 +44,7 @@ AuthRoute.get('/profile', authorization, getUserProfile, (req, res) => {
     return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in fetching profile process");
   }
 });
-AuthRoute.patch('/profile', authorization, upload.single('avatar'), validateImageFile, validateUpdateProfileBody, DeleteUserAvatar, UpdateUserProfile, (req, res) => {
+AuthRoute.patch('/profile', authorization, upload.single('avatar'), UpdateUserProfile, (req, res) => {
   try {
     return sendResponse(res, 200, false, "successfully updated user profile ", res.data);
   } catch {

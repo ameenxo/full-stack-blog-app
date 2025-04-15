@@ -1,8 +1,5 @@
 function validateBody(body, schema, AllFieldRequire) {
     const errors = {}
-    if (Object.keys(body).length === 0) {
-        return { valid: false, error: true, message: "no body provided " }
-    }
     if (AllFieldRequire) {
         Object.keys(schema).forEach((field) => {
             if (!body[field]) {

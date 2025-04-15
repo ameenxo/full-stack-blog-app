@@ -143,7 +143,7 @@ async function updateOneBlog(req, res, next) {
                 );
             }
             res.data = updatedBlog;
-            if (oldImageFile) {
+            if (oldImageFile && imageFound) {
                 deleteImage(path.join(__dirname, "../images", oldImageFile));
             }
             next();
