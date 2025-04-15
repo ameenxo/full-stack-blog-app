@@ -17,11 +17,14 @@ const blogCreateSchema = {
     title: 'string',
     content: 'string',
     tags: 'array',
-
 };
+const blogCommentSchema = {
+    comment: 'string',
+}
 module.exports = {
     userRegisterSchema,
     userLoginSchema,
     userUpdateProfileSchema,
     blogCreateSchema,
+    blogCommentSchema,
 }

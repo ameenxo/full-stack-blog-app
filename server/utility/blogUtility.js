@@ -1,7 +1,6 @@
 const Blog = require("../models /blogModel");
 
 async function getImageFileNameById(blogId) {
-
     try {
         const blog = await Blog.getOne(blogId)
         if (!blog) {

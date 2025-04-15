@@ -2,7 +2,7 @@ const Blog = require("../models /blogModel");
 const { getImageFileNameById } = require("../utility/blogUtility");
 const CustomError = require("../utility/customError");
 const deleteImage = require("../utility/deleteImage");
-const { blogCreateSchema } = require("../utility/schema");
+const { blogCreateSchema, blogCommentSchema } = require("../utility/schema");
 const sendResponse = require("../utility/sendResponse");
 const { validateBody, validateImageFile } = require("../utility/validateBody");
 const path = require("path");
@@ -11,27 +11,25 @@ const path = require("path");
 
 async function addBlog(req, res, next) {
     try {
-        if (!req.file) {
-            throw new CustomError("Image is required", 400, "image issue ");
+        const { error, valid, message } = await validateBody(req.body, blogCreateSchema, true);
+        if (!valid || error) {
+            throw new CustomError(message, 401, "bad request");
         }
-        const imageUrl = `http://localhost:2025/uploads/${req.file.filename}`; //
-        const { title, content, image, tags } = req.body;
-        const newBlog = await Blog.createNewBlog(
-            title,
-            content,
-            req.user._id,
-            imageUrl,
-            tags
-        );
-        if (!newBlog)
-            throw new CustomError(
-                "cannot create new blog",
-                404,
-                "not getting exact error"
-            );
         else {
-            res.newBlog = newBlog;
-            next();
+            const { error, imageFound, message } = validateImageFile(req, true)
+            if (!imageFound || error) {
+                throw new CustomError(message, 401, "bad request");
+            }
+            const NewBlogObject = req.body;
+            NewBlogObject.imageUrl = `http://localhost:2025/images/${req.file.filename}`;
+            NewBlogObject.author = req.user._id;
+            const newBlog = await Blog.create(NewBlogObject);
+            if (!newBlog) {
+                throw new CustomError("cannot create new blog", 404, "not getting exact error");
+            } else {
+                res.data = newBlog;
+                next()
+            }
         }
     } catch (error) {
         if (req.file) {
@@ -63,6 +61,9 @@ async function getAllBlogs(req, res, next) {
 }
 async function getOneBlog(req, res, next) {
     try {
+        if (!req.params.id || req.params.id.length !== 24) {
+            throw new CustomError('required field are empty or not  valid  ,id', 401, "bad request");
+        }
         const blog = await Blog.getOne(req.params.id);
         if (!blog) throw new CustomError("cannot find blog", 404, "not find blog");
         res.blog = blog;
@@ -78,17 +79,25 @@ async function getOneBlog(req, res, next) {
 }
 async function deleteOneBlog(req, res, next) {
     try {
+        if (!req.params.id || req.params.id.length !== 24) {
+            throw new CustomError("required field are empty or not  valid  ,id", 401, "bad request");
+        }
+        const { error, message, fileName } = await getImageFileNameById(req.params.id);
+        if (error || !fileName) {
+            throw new CustomError(message, 404, "cannot find blog");
+        }
         const deletedBlog = await Blog.deleteBlog(req.params.id);
-        if (!deletedBlog)
+        if (!deletedBlog) {
             throw new CustomError(
                 "cannot delete blog",
                 404,
                 "not getting exact error"
             );
-        else {
-            res.deletedBlog = deletedBlog;
-            next();
         }
+        deleteImage(path.join(__dirname, "../images", fileName));
+        res.data = deletedBlog;
+        next();
+
     } catch (error) {
         return sendResponse(
             res,
@@ -162,7 +171,7 @@ async function toggleLike(req, res, next) {
                 "not getting exact error"
             );
         } else {
-            res.Blog = blog;
+            res.data = blog;
             next();
         }
     } catch (error) {
@@ -176,6 +185,10 @@ async function toggleLike(req, res, next) {
 }
 async function addComment(req, res, next) {
     try {
+        const { error, message, valid } = validateBody(req.body, blogCommentSchema, true);
+        if (error || !valid) {
+            throw new CustomError(message, 401, "bad request");
+        }
         const blogComment = await Blog.addComment(
             req.params.id,
             req.user._id,
@@ -188,7 +201,7 @@ async function addComment(req, res, next) {
                 "not getting exact error"
             );
         else {
-            res.Blog = blogComment;
+            res.data = blogComment;
             next();
         }
     } catch (error) {
@@ -200,8 +213,12 @@ async function addComment(req, res, next) {
         );
     }
 }
+
 async function deleteComment(req, res, next) {
     try {
+        if (!req.params.blogId || !req.params.commentId || req.params.blogId.length !== 24 || req.params.commentId.length !== 24) {
+            throw new CustomError("required field are empty or not  valid  ,id", 401, "bad request");
+        }
         const deleteBlogComment = await Blog.deleteComment(
             req.params.blogId,
             req.user._id,
@@ -214,7 +231,7 @@ async function deleteComment(req, res, next) {
                 "not getting exact error"
             );
         }
-        res.deleteBlogComment = deleteBlogComment;
+        res.data = deleteBlogComment;
         next();
     } catch (error) {
         return sendResponse(

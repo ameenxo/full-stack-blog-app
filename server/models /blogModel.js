@@ -42,19 +42,19 @@ const blogSchema = new mongoose.Schema({
     default: 0,
   },
 });
-blogSchema.statics.createNewBlog = async function (title, content, author, imageUrl, tags) {
+blogSchema.statics.createNewBlog = async function (data) {
   try {
-    if (!title || !content || !author || !imageUrl) {
-      throw new CustomError("required field are empty", 401, "bad request");
+    if (!data) {
+      throw new CustomError("cannot get blog data", 401, "bad request");
     }
-    const newBlog = await this.create({ title, content, author, imageUrl, tags });
+    const newBlog = await this.create(data);
     if (!newBlog)
       throw new CustomError("cannot create new blog", 404, "not getting exact error");
     return newBlog;
   } catch (error) {
     throw new CustomError(error.message || "cannot get exact error {blogSchema.createNewBlog}", error.statusCode || 405, "not getting exact error");
   }
-};
+}
 blogSchema.statics.getOne = async function (id) {
   try {
     if (!id)
@@ -112,7 +112,7 @@ blogSchema.statics.toggleLike = async function (blogId, userId) {
       throw new CustomError("cannot get blog-Id or userId", 401, "bad request");
     const blog = await Blog.findById(blogId);
     if (!blog)
-      throw new CustomError(`cannot find user with this id :${blogId}`, 404, "not find blog");
+      throw new CustomError(`cannot find blog with id :${blogId}`, 404, "not find blog");
     const isLiked = blog.likes.includes(userId);
     if (isLiked) {
       blog.likes = await blog.likes.filter((id) => id.toString() !== userId);

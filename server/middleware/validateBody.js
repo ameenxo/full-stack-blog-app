@@ -54,13 +54,6 @@ function createBlogBody(req, res, next) {
         }
 };
 function getOneBlogBody(req, res, next) {
-        try {
-                if (!req.params.id || req.params.id.length !== 24) {
-                        throw new CustomError("required field are empty or not  valid  ,id", 401, "bad request");
-                } else next();
-        } catch (error) {
-                return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in validating login body");
-        }
 
 };
 function validateDeleteBody(req, res, next) {
@@ -73,26 +66,13 @@ function validateDeleteBody(req, res, next) {
         }
 };
 function validateCommentBody(req, res, next) {
-        try {
-                if (!req.body.comment)
-                        throw new CustomError("required field are empty .: comment field", 401, "bad request");
-                next();
 
-        } catch (error) {
-                return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in validating login body");
-        }
 }
 function validateDeleteCommentBody(req, res, next) {
         try {
-                if (!req.params.blogId || !req.params.commentId) {
-                        throw new CustomError("required field are empty .: comment field", 401, "bad request");
-                }
+               
 
-                else if (req.params.blogId.length !== 24 || req.params.commentId.length !== 24)
-
-
-                        throw new CustomError("required field are empty or not  valid  ,id", 401, "bad request");
-                next();
+              
         } catch (error) {
                 return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in validating login body");
         }
