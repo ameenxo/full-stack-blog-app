@@ -3,6 +3,8 @@ const User = require("../models /userModel");
 const CustomError = require("../utility/customError");
 const jwt = require('jsonwebtoken');
 const sendResponse = require("../utility/sendResponse");
+const { validateBody } = require("../utility/validateBody");
+const { userRegisterSchema } = require("../utility/schema");
 
 async function authorization(req, res, next) {
     try {
@@ -51,7 +53,11 @@ async function authorization(req, res, next) {
 };
 async function checkUserExist(req, res, next) {
     try {
-        const { username, email } = req.body
+        const { error, message, valid } = await validateBody(req.body, userRegisterSchema, true);
+        if (!valid || error) {
+            throw new CustomError(message, 401, "bad request");
+        }
+        const { username, email } = req.body;
         const user = await User.isUserExist(username, email);
         if (user) {
             throw new CustomError("user Already exist with this email or username", 401, "user already exist");
@@ -64,7 +70,7 @@ async function checkUserExist(req, res, next) {
 };
 async function createUser(req, res, next) {
     try {
-        const newUser = await User.createUser(req.body.username, req.body.email, req.body.password, req.body.fullName);
+        const newUser = await User.createUser(req.body);
         if (!newUser) {
             throw new CustomError("registration failed please try again ", 401, "cannot get any idea ")
         }

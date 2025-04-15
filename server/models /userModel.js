@@ -66,11 +66,11 @@ userSchema.statics.isUserExist = async function (username, email) {
   return !!user;
 
 };
-userSchema.statics.createUser = async function (username, email, password, fullName) {
+userSchema.statics.createUser = async function (userData) {
   try {
     const saltRound = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, saltRound);
-    const newUser = await this.create({ username, email, name: fullName, password: hashedPassword, });
+    const hashedPassword = await bcrypt.hash(userData.password, saltRound);
+    const newUser = await this.create({ ...userData, name: userData.fullName, password: hashedPassword, });
     return newUser;
   } catch (error) {
     throw new CustomError(error.message, 404, "not getting exact error");
