@@ -1,0 +1,40 @@
+function validateBody(body, schema, AllFieldRequire) {
+    const errors = {}
+    if (Object.keys(body).length === 0) {
+        return { valid: false, error: true, message: "no body provided " }
+    }
+    if (AllFieldRequire) {
+        Object.keys(schema).forEach((field) => {
+            if (!body[field]) {
+                errors[field] = `${field} is required`;
+            } else if (schema[field] === 'string' && typeof body[field] !== 'string') {
+                errors[field] = `${field} must be a string`;
+            }
+        });
+        Object.keys(body).forEach((field) => {
+            if (!schema[field]) {
+                errors[field] = `${field} is not a valid field`;
+            }
+        });
+    }
+    else {
+        Object.keys(body).forEach((field) => {
+            if (schema[field]) {
+                if (schema[field] === 'string' && typeof body[field] !== 'string') {
+                    errors[field] = `${field} must be a string`;
+                }
+            } else {
+                errors[field] = `${field} is not a valid field`;
+            }
+        });
+    }
+    if (Object.keys(errors).length > 0) {
+        return {
+            valid: false,
+            error: true,
+            message: Object.values(errors).join(', '),
+        };
+    }
+    return { valid: true, error: false, message: 'Validation successful' };
+};
+module.exports = validateBody;
