@@ -4,7 +4,7 @@ const CustomError = require("../utility/customError");
 const jwt = require('jsonwebtoken');
 const sendResponse = require("../utility/sendResponse");
 const { validateBody } = require("../utility/validateBody");
-const { userRegisterSchema } = require("../utility/schema");
+const { userRegisterSchema, userLoginSchema } = require("../utility/schema");
 
 async function authorization(req, res, next) {
     try {
@@ -83,6 +83,10 @@ async function createUser(req, res, next) {
 }
 async function authenticateUser(req, res, next) {
     try {
+        const { error, message, valid } = validateBody(req.body, userLoginSchema, true);
+        if (!valid || error) {
+            throw new CustomError(message, 401, "bad request");
+        }
         const user = await User.authenticateUser(req.body.emailOrUsername, req.body.password);
         if (!user) {
             throw new CustomError("invalid credential .username or password is incorrect", 402, "invalid credential");

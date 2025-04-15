@@ -12,7 +12,7 @@ const AuthRoute = express.Router();
 AuthRoute.post('/register', checkUserExist, createUser, (req, res) => {
   return sendResponse(res, 200, false, "successfully created an account",);
 });
-AuthRoute.post('/login', validateLoginBody, authenticateUser, generateToken, (req, res) => {
+AuthRoute.post('/login', authenticateUser, generateToken, (req, res) => {
   try {
     res.cookie('token', res.token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
     return sendResponse(res, 200, false, "your successfully log in", res.data);
@@ -20,7 +20,7 @@ AuthRoute.post('/login', validateLoginBody, authenticateUser, generateToken, (re
     return sendResponse(res, error.statusCode, true, error.message);
   }
 });
-AuthRoute.post('/logout', (req, res) => {
+AuthRoute.post('/logout', authenticateUser, (req, res) => {
   try {
     res.clearCookie("token", { path: "/", httpOnly: true, secure: true, sameSite: "strict" });
     return sendResponse(res, 200, false, "successfully log out");
