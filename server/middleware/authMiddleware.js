@@ -31,7 +31,7 @@ async function authorization(req, res, next) {
                 }
             })
 
-            if (["PUT", "DELETE"].includes(req.method) && req.params.id) {
+            if (["PUT", "DELETE", "PATCH"].includes(req.method) && req.params.id) {
                 const blog = await Blog.getOne(req.params.id);
                 if (!blog)
                     throw new CustomError("blog not found", 404, "blog not found");

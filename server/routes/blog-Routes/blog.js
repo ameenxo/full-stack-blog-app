@@ -5,6 +5,7 @@ const blogRoute = express.Router();
 const { addBlog, deleteOneBlog, getOneBlog, getAllBlogs, updateOneBlog, toggleLike, addComment, deleteComment } = require('../../middleware/blogOperations');
 const { createBlogBody, getOneBlogBody, validateDeleteBody, validateCommentBody, validateDeleteCommentBody } = require('../../middleware/validateBody');
 const sendResponse = require('../../utility/sendResponse');
+const deleteImage = require('../../utility/deleteImage');
 
 //create new blog for logged users
 blogRoute.post('/', authorization, upload.single("image"), createBlogBody, addBlog, (req, res) => {
@@ -29,15 +30,18 @@ blogRoute.get('/', authorization, getAllBlogs, (req, res) => {
 //get one blog by blogId for logged users
 blogRoute.get('/:id', authorization, getOneBlogBody, getOneBlog, (req, res) => {
     return sendResponse(res, 200, false, "fetched one blog by id", res.blog);
-
-
 });
 //update a blog by author of blog
-blogRoute.put('/:id', authorization, updateOneBlog, (req, res) => {
+blogRoute.patch('/:id', authorization, upload.single("image"), updateOneBlog, (req, res) => {
     try {
-        return sendResponse(res, 200, false, "updated successfully", res.updatedBlog);
-
+        if (req.file && req.OldImageFile) {
+            deleteImage(OldImageFile);
+        }
+        return sendResponse(res, 200, false, "updated successfully", res.data);
     } catch (error) {
+        if (req.file) {
+            deleteImage(req.file.path);
+        }
         return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in authorization process");
     }
 });

@@ -3,6 +3,8 @@ const CustomError = require('../utility/customError');
 const user = require('../models /userModel')
 const sendResponse = require('../utility/sendResponse');
 const deleteImage = require('../utility/deleteImage');
+const { validateBody } = require('../utility/validateBody');
+const { blogCreateSchema } = require('../utility/schema');
 function validateRegisterBody(req, res, next) {
 
         try {
@@ -39,12 +41,11 @@ function validateLoginBody(req, res, next) {
 }
 function createBlogBody(req, res, next) {
         try {
-
-                if (!req.user)
-                        throw new CustomError("cannot find user details ", 401, "user not found");
-                if (!req.body.title || !req.body.content || !req.body.tags) {
-                        throw new CustomError("required field are empty", 401, "bad request");
-                } else next();
+                const { error, message, valid } = validateBody(req.body, blogCreateSchema, true);
+                if (error && !valid) {
+                        throw new CustomError(message, 400, "request not accept")
+                }
+                next();
         } catch (error) {
                 if (req.file) {
                         deleteImage(req.file.path);

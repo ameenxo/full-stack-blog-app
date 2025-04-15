@@ -37,4 +37,14 @@ function validateBody(body, schema, AllFieldRequire) {
     }
     return { valid: true, error: false, message: 'Validation successful' };
 };
-module.exports = validateBody;
+function validateImageFile(req, required) {
+    if (required && !req.file) {
+        return { imageFound: false, error: true, message: 'Image file is required' };
+    }
+    if (req.file) {
+        return { imageFound: true, error: false, message: 'Image file found' };
+    }
+    return { imageFound: false, error: false, message: 'No image file provided' };
+
+}
+module.exports = { validateBody, validateImageFile };

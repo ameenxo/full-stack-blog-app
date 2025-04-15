@@ -93,21 +93,15 @@ blogSchema.statics.deleteBlog = async function (id) {
     throw new CustomError(error.message || "cannot get exact error {blog-model,staticMethod:deleteOneById},", error.statusCode || 401, "error in find One");
   }
 };
-blogSchema.statics.updateById = async function (id, userId, data) {
+blogSchema.statics.updateById = async function (blogId, data) {
   try {
-    const blog = await Blog.findById(id);
-    if (!blog)
-      throw new CustomError("cannot find blog with given id", 404, "cannot find blog");
-
-    if (blog.author.toString() !== userId) {
-      throw new CustomError("Unauthorized: Only the author can update this blog", 403, "Forbidden");
-    };
-    const updatedBlog = await this.findByIdAndUpdate(id, data, { new: true, runValidators: true });
-    if (!updatedBlog) {
-      throw new CustomError("Failed to update blog", 500, "Server Error");
+    const blog = await this.findByIdAndUpdate(blogId, {
+      $set: data,
+    }, { new: true });
+    if (!blog) {
+      throw new CustomError(`blog not found with ${blogId}`, 404, "invalid request")
     }
-    return updatedBlog;
-
+    return blog
   } catch (error) {
     throw new CustomError(error.message || "cannot get exact error {blog-model,staticMethod:updateById}", error.statusCode || 500, error.errorCode || "error in update blog");
   }
