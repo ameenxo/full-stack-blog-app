@@ -94,7 +94,7 @@ async function deleteOneBlog(req, res, next) {
                 "not getting exact error"
             );
         }
-        deleteImage(path.join(__dirname, "../images", fileName));
+        deleteImage(fileName);
         res.data = deletedBlog;
         next();
 

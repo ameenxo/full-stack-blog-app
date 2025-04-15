@@ -4,6 +4,7 @@ const { authorization } = require('../../middleware/authMiddleware');
 const sendResponse = require('../../utility/sendResponse');
 const { getUserProfile, UpdateUserProfile, createUser } = require('../../middleware/userOperation');
 const upload = require('../../middleware/uploadImages');
+const deleteImage = require('../../utility/deleteImage');
 
 
 const AuthRoute = express.Router();
@@ -19,7 +20,7 @@ AuthRoute.post('/login', authenticateUser, generateToken, (req, res) => {
     return sendResponse(res, error.statusCode, true, error.message);
   }
 });
-AuthRoute.post('/logout', authenticateUser, (req, res) => {
+AuthRoute.post('/logout', authorization, (req, res) => {
   try {
     res.clearCookie("token", { path: "/", httpOnly: true, secure: true, sameSite: "strict" });
     return sendResponse(res, 200, false, "successfully log out");
@@ -47,6 +48,9 @@ AuthRoute.patch('/profile', authorization, upload.single('avatar'), UpdateUserPr
   try {
     return sendResponse(res, 200, false, "successfully updated user profile ", res.data);
   } catch {
+    if (req.file) {
+      deleteImage(req.file.filename)
+    }
     return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error. updating profile process");
   }
 })

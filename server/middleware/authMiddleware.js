@@ -105,5 +105,5 @@ async function generateToken(req, res, next) {
         return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in authorization process");
     }
 }
-module.exports = { checkUserExist, createUser, authenticateUser, generateToken, authorization }
+module.exports = { checkUserExist, authenticateUser, generateToken, authorization }
 

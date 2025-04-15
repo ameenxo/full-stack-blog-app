@@ -44,13 +44,13 @@ async function UpdateUserProfile(req, res, next) {
             throw new CustomError("user not found", 404, "user not found");
         }
         if (req.file) {
-            deleteImage(path.join(__dirname, "../images", oldImageFile));
+            deleteImage(oldImageFile);
         }
         res.data = updatedUser;
         next();
     } catch (error) {
         if (req.file) {
-            deleteImage(req.file.path)
+            deleteImage(req.file.filename)
         }
         return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in getUserProfile Middleware");
     }
@@ -68,4 +68,4 @@ async function createUser(req, res, next) {
         return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error. from createUser middleware");
     }
 }
-module.exports = { getUserProfile, UpdateUserProfile,createUser }
+module.exports = { getUserProfile, UpdateUserProfile, createUser }
