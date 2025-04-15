@@ -1,9 +1,8 @@
 const express = require('express');
-const { validateRegisterBody, validateLoginBody, validateUpdateProfileBody, validateImageFile } = require('../../middleware/validateBody');
-const { checkUserExist, createUser, authenticateUser, generateToken } = require('../../middleware/authMiddleware');
+const { checkUserExist, authenticateUser, generateToken } = require('../../middleware/authMiddleware');
 const { authorization } = require('../../middleware/authMiddleware');
 const sendResponse = require('../../utility/sendResponse');
-const { getUserProfile, UpdateUserProfile, DeleteUserAvatar } = require('../../middleware/userUtils');
+const { getUserProfile, UpdateUserProfile, createUser } = require('../../middleware/userOperation');
 const upload = require('../../middleware/uploadImages');
 
 

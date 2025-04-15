@@ -68,19 +68,7 @@ async function checkUserExist(req, res, next) {
     }
 
 };
-async function createUser(req, res, next) {
-    try {
-        const newUser = await User.createUser(req.body);
-        if (!newUser) {
-            throw new CustomError("registration failed please try again ", 401, "cannot get any idea ")
-        }
-        res.userId = newUser._id
-        next()
 
-    } catch (error) {
-        return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error. from createUser middleware");
-    }
-}
 async function authenticateUser(req, res, next) {
     try {
         const { error, message, valid } = validateBody(req.body, userLoginSchema, true);

@@ -6,6 +6,7 @@ const path = require('path');
 const { validateBody, validateImageFile } = require('../utility/validateBody');
 const { userUpdateProfileSchema } = require('../utility/schema');
 const { getAvatarImageFile } = require('../utility/userUtility');
+
 async function getUserProfile(req, res, next) {
     try {
         const userProfile = await User.getUserProfile(req.user._id);
@@ -54,26 +55,17 @@ async function UpdateUserProfile(req, res, next) {
         return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in getUserProfile Middleware");
     }
 }
-async function DeleteUserAvatar(req, res, next) {
+async function createUser(req, res, next) {
     try {
-        const user = await User.getUserProfile(req.user._id);
-        if (!user) {
-            throw new CustomError("user not found", 404, "user not found");
+        const newUser = await User.createUser(req.body);
+        if (!newUser) {
+            throw new CustomError("registration failed please try again ", 401, "cannot get any idea ")
         }
-        const oldAvatarUrl = user.avatar;
-        const oldFilename = await oldAvatarUrl.split('/').pop();
-        if (!oldFilename || oldFilename === "default.jpg") {
-            return next();
-        }
-        await deleteImage(path.join(__dirname, "../images", oldFilename));
-        next();
+        res.userId = newUser._id
+        next()
 
     } catch (error) {
-        if (req.file) {
-            deleteImage(req.file.path)
-        }
-        return sendResponse(res, error.statusCode || 500, true, error.message || "cannot get exact error. error in getUserProfile Middleware");
+        return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error. from createUser middleware");
     }
-
 }
-module.exports = { getUserProfile, UpdateUserProfile, DeleteUserAvatar }
+module.exports = { getUserProfile, UpdateUserProfile,createUser }
