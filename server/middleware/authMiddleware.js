@@ -55,12 +55,12 @@ async function checkUserExist(req, res, next) {
     try {
         const { error, message, valid } = await validateBody(req.body, userRegisterSchema, true);
         if (!valid || error) {
-            throw new CustomError(message, 401, "bad request");
+            throw new CustomError(message, 400, "bad request");
         }
         const { username, email } = req.body;
         const user = await User.isUserExist(username, email);
         if (user) {
-            throw new CustomError("user Already exist with this email or username", 401, "user already exist");
+            throw new CustomError("user Already exist with this email or username", 409, "user already exist");
         }
         next();
     } catch (error) {
@@ -73,7 +73,7 @@ async function authenticateUser(req, res, next) {
     try {
         const { error, message, valid } = validateBody(req.body, userLoginSchema, true);
         if (!valid || error) {
-            throw new CustomError(message, 401, "bad request");
+            throw new CustomError(message, 400, "bad request");
         }
         const user = await User.authenticateUser(req.body.emailOrUsername, req.body.password);
         if (!user) {
@@ -96,7 +96,7 @@ async function generateToken(req, res, next) {
     try {
         const token = await User.generateToken(res.user);
         if (!token)
-            throw new CustomError("cannot generate token", 401, "cannot generate token");
+            throw new CustomError("cannot generate token", 500, "cannot generate token");
         else {
             res.token = token
             next();

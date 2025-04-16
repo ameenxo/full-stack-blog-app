@@ -13,19 +13,19 @@ async function addBlog(req, res, next) {
     try {
         const { error, valid, message } = await validateBody(req.body, blogCreateSchema, true);
         if (!valid || error) {
-            throw new CustomError(message, 401, "bad request");
+            throw new CustomError(message, 400, "bad request");
         }
         else {
             const { error, imageFound, message } = validateImageFile(req, true)
             if (!imageFound || error) {
-                throw new CustomError(message, 401, "bad request");
+                throw new CustomError(message, 400, "bad request");
             }
             const NewBlogObject = req.body;
             NewBlogObject.imageUrl = `http://localhost:2025/images/${req.file.filename}`;
             NewBlogObject.author = req.user._id;
             const newBlog = await Blog.create(NewBlogObject);
             if (!newBlog) {
-                throw new CustomError("cannot create new blog", 404, "not getting exact error");
+                throw new CustomError("cannot create new blog", 500, "not getting exact error");
             } else {
                 res.data = newBlog;
                 next()
@@ -62,7 +62,7 @@ async function getAllBlogs(req, res, next) {
 async function getOneBlog(req, res, next) {
     try {
         if (!req.params.id || req.params.id.length !== 24) {
-            throw new CustomError('required field are empty or not  valid  ,id', 401, "bad request");
+            throw new CustomError('required field are empty or not  valid  ,id', 400, "bad request");
         }
         const blog = await Blog.getOne(req.params.id);
         if (!blog) throw new CustomError("cannot find blog", 404, "not find blog");
@@ -109,6 +109,9 @@ async function deleteOneBlog(req, res, next) {
 }
 async function updateOneBlog(req, res, next) {
     try {
+        if (Object.keys(req.body).length === 0 && !req.file) {
+            throw new CustomError('no data provided', 400, 'bad request')
+        }
         var oldImageFile = null;
         const { error, message, valid } = validateBody(
             req.body,
@@ -163,6 +166,9 @@ async function updateOneBlog(req, res, next) {
 // USER ACTIONS
 async function toggleLike(req, res, next) {
     try {
+        if (!req.params.id || req.params.id !== 24) {
+            throw new CustomError(`invalid blog id .${req.params.id}`, 400, "bad request")
+        }
         const blog = await Blog.toggleLike(req.params.id, req.user._id);
         if (!blog) {
             throw new CustomError(
@@ -185,6 +191,9 @@ async function toggleLike(req, res, next) {
 }
 async function addComment(req, res, next) {
     try {
+        if (!req.params.id || req.params.id !== 24) {
+            throw new CustomError(`invalid blog id .${req.params.id}`, 400, "bad request")
+        }
         const { error, message, valid } = validateBody(req.body, blogCommentSchema, true);
         if (error || !valid) {
             throw new CustomError(message, 401, "bad request");

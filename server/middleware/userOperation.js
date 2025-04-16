@@ -2,7 +2,6 @@ const User = require('../models /userModel');
 const CustomError = require('../utility/customError');
 const deleteImage = require('../utility/deleteImage');
 const sendResponse = require('../utility/sendResponse');
-const path = require('path');
 const { validateBody, validateImageFile } = require('../utility/validateBody');
 const { userUpdateProfileSchema } = require('../utility/schema');
 const { getAvatarImageFile } = require('../utility/userUtility');
@@ -21,6 +20,9 @@ async function getUserProfile(req, res, next) {
 }
 async function UpdateUserProfile(req, res, next) {
     try {
+        if (!req.file && Object.keys(req.body).length === 0) {
+            throw new CustomError('data not provided', 400, "bad request")
+        }
         let oldImageFile = null
         const { error, message, valid } = validateBody(req.body, userUpdateProfileSchema, false);
         if (error || !valid) {
@@ -59,7 +61,7 @@ async function createUser(req, res, next) {
     try {
         const newUser = await User.createUser(req.body);
         if (!newUser) {
-            throw new CustomError("registration failed please try again ", 401, "cannot get any idea ")
+            throw new CustomError("Failed to create user. Please try again later.", 500, "cannot get any idea ")
         }
         res.userId = newUser._id
         next()
