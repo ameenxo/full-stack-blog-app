@@ -68,7 +68,6 @@ async function checkUserExist(req, res, next) {
     }
 
 };
-
 async function authenticateUser(req, res, next) {
     try {
         const { error, message, valid } = validateBody(req.body, userLoginSchema, true);

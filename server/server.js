@@ -2,13 +2,14 @@ require('dotenv').config();
 require('module-alias/register')
 const express = require('express');
 const mongoose = require('mongoose');
-const AuthRoute = require('./routes/userRoutes/userAuth');
 const app = express();
 const cors = require('cors')
 const cookieParser = require('cookie-parser');
-const blogRoute = require('./routes/blog-Routes/blog.js');
 const path = require('path')
 const { authorization } = require('./middleware/authMiddleware.js');
+const AuthRoute = require('./routes/AuthRoute.js');
+const UserRoute = require('./routes/UserRoute.js');
+const blogRoute = require('./routes/BlogRoute.js');
 
 
 app.use(express.json())
@@ -17,8 +18,9 @@ app.use(cors({
     credentials: true,
 }))
 app.use(cookieParser())
-app.use('/user', AuthRoute);
-app.use('/blog', blogRoute);
+app.use('/', AuthRoute)
+app.use('/user', authorization, UserRoute);
+app.use('/blog', authorization, blogRoute);
 app.use('/images', authorization, express.static(path.join(__dirname, 'images')));
 app.use(express.urlencoded({
     extended: true

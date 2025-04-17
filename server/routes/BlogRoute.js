@@ -1,13 +1,14 @@
 const express = require('express');
-const { authorization } = require('../../middleware/authMiddleware');
-const upload = require("../../middleware/uploadImages"); // ✅ Adjust path if needed
-const blogRoute = express.Router();
-const { addBlog, deleteOneBlog, getOneBlog, getAllBlogs, updateOneBlog, toggleLike, addComment, deleteComment } = require('../../middleware/blogOperations');
-const sendResponse = require('../../utility/sendResponse');
-const deleteImage = require('../../utility/deleteImage');
+const upload = require('../middleware/uploadImages');
+const { addBlog, getAllBlogs, getOneBlog, updateOneBlog, deleteOneBlog, toggleLike, addComment, deleteComment } = require('../middleware/blogOperations');
+const deleteImage = require('../utility/deleteImage');
+const sendResponse = require('../utility/sendResponse');
+const BlogRoute = express.Router();
 
-//create new blog for logged users
-blogRoute.post('/', authorization, upload.single("image"), addBlog, (req, res) => {
+
+
+
+BlogRoute.post('/', upload.single("image"), addBlog, (req, res) => {
     try {
         return sendResponse(res, 200, false, "blog added successfully", res.data);
     } catch (error) {
@@ -18,7 +19,7 @@ blogRoute.post('/', authorization, upload.single("image"), addBlog, (req, res) =
     }
 });
 //get all blogs for logged users
-blogRoute.get('/', authorization, getAllBlogs, (req, res) => {
+BlogRoute.get('/', getAllBlogs, (req, res) => {
     try {
         return sendResponse(res, 200, false, "fetched all blogs", res.allBlogs);
 
@@ -27,11 +28,11 @@ blogRoute.get('/', authorization, getAllBlogs, (req, res) => {
     }
 });
 //get one blog by blogId for logged users
-blogRoute.get('/:id', authorization, getOneBlog, (req, res) => {
+BlogRoute.get('/:id', getOneBlog, (req, res) => {
     return sendResponse(res, 200, false, "fetched one blog by id", res.blog);
 });
 //update a blog by author of blog
-blogRoute.patch('/:id', authorization, upload.single("image"), updateOneBlog, (req, res) => {
+BlogRoute.patch('/:id', upload.single("image"), updateOneBlog, (req, res) => {
     try {
         if (req.file && req.OldImageFile) {
             deleteImage(OldImageFile);
@@ -45,7 +46,7 @@ blogRoute.patch('/:id', authorization, upload.single("image"), updateOneBlog, (r
     }
 });
 //delete a blog by author of blog
-blogRoute.delete('/:id', authorization, deleteOneBlog, (req, res) => {
+BlogRoute.delete('/:id', deleteOneBlog, (req, res) => {
     try {
         return sendResponse(res, 200, false, "deleted successfully", res.data);
 
@@ -54,7 +55,7 @@ blogRoute.delete('/:id', authorization, deleteOneBlog, (req, res) => {
     }
 });
 //like or unlike blog by blogId
-blogRoute.post('/like/:id', authorization, toggleLike, (req, res) => {
+BlogRoute.post('/like/:id', toggleLike, (req, res) => {
     try {
         return sendResponse(res, 200, false, "like updated", res.data);
 
@@ -64,7 +65,7 @@ blogRoute.post('/like/:id', authorization, toggleLike, (req, res) => {
 
 });
 //add comment to blog by blogId
-blogRoute.post('/comment/:id', authorization, addComment, (req, res) => {
+BlogRoute.post('/comment/:id', addComment, (req, res) => {
     try {
         return sendResponse(res, 200, false, "comment added successfully", res.data);
 
@@ -73,7 +74,7 @@ blogRoute.post('/comment/:id', authorization, addComment, (req, res) => {
     }
 });
 //delete blog comment by commentId
-blogRoute.delete('/comment/:blogId/:commentId', authorization, deleteComment, (req, res) => {
+BlogRoute.delete('/comment/:blogId/:commentId', deleteComment, (req, res) => {
     try {
         return sendResponse(res, 200, false, "comment deleted successfully", res.data);
     } catch (error) {
@@ -81,5 +82,4 @@ blogRoute.delete('/comment/:blogId/:commentId', authorization, deleteComment, (r
     }
 
 });
-
-module.exports = blogRoute
+module.exports = BlogRoute
