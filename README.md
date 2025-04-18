@@ -28,19 +28,77 @@ A full-stack social blogging platform where users can create, view, like, and co
 - **Multer** for image upload
 - **Cookie-based Auth** (No JWT)
 
-## 📂 Project Structure (Frontend)
+
+
+## 📂 Project Structure 
 
 ```bash
-/components
-  └── BlogCard.tsx
-  └── BlogCardList.tsx
-  └── CommentInput.tsx
-  └── CommentItem.tsx
-  └── UserProfile.tsx
+/.
+├── client/              # Frontend using Next.js
+│   └── src/
+│       ├── app/         # All routes and pages
+│       ├── components/  # Reusable UI components
+│       ├── Context/     # Auth and Blog Context
+│       ├── types/       # TypeScript types
+│       └── utility/     # Utility functions
+│
+├── server/              # Backend using Node.js & Express
+│   ├── models/          # Mongoose schemas
+│   ├── routes/          # API routes for auth, blogs, users
+│   ├── middleware/      # Auth, image upload, validations
+│   ├── utility/         # Custom utilities & helpers
+│   ├── images/          # Stored blog images
+│   └── server.js        # Entry point for backend
 
-/contexts
-  └── UserContext.tsx
-  └── BlogContext.tsx
+```
+ 
+## 🛠️ installation 
+ 
+1. Clone the Repository
+ ```
+ git clone https://github.com/ameenxo/full-stack-blog-app.git
+ ```
+2. Install Dependencies Backend (server)
+ ```
+ cd server
+ npm install
+ ```
+3. Install Dependencies Frontend (client)
+ ```
+ cd client
+ npm install
+ ```
+4. Setup Environment Variables
+ In the server folder, create a .env file:
+ ```
+ MONGO_URI=your_mongodb_uri
+ PORT=5000
+ ```
+5. Start Development Servers
+ ```
+ # Start backend
+ cd server
+ npm run dev
 
-/utils
-  └── api.ts  # Axios utility functions
+ # Start frontend (in new terminal)
+ cd ../client
+ npm run dev
+ ```
+Backend: http://localhost:5000
+
+Frontend: http://localhost:5173
+
+🧪 In Progress / Upcoming
+🔄 Real-Time Messaging with Socket.IO
+
+🗨️ Chat History and UI
+
+🔔 Notifications (likes, comments, messages)
+
+🚀 Production Deployment (Render + Vercel)
+
+
+
+
+
+
