@@ -29,23 +29,7 @@ A full-stack social blogging platform where users can create, view, like, and co
 - **Cookie-based Auth** (No JWT)
 
 <<<<<<< Updated upstream
-## 📂 Project Structure (Frontend)
 
-```bash
-/components
-  └── BlogCard.tsx
-  └── BlogCardList.tsx
-  └── CommentInput.tsx
-  └── CommentItem.tsx
-  └── UserProfile.tsx
-
-/contexts
-  └── UserContext.tsx
-  └── BlogContext.tsx
-
-/utils
-  └── api.ts  # Axios utility functions
-=======
 ## ⚙️ Requirements
 
 Make sure you have the following installed on your machine before starting the project:
@@ -143,4 +127,4 @@ Frontend: http://localhost:5173
 🔔 Notifications (likes, comments, messages)
 
 🚀 Production Deployment (Render + Vercel)
->>>>>>> Stashed changes
+
