@@ -3,16 +3,13 @@ import { ApiError } from "./error";
 import { ApiResponse } from "@/types/api-response";
 import { Blog } from "@/types/blog";
 import { User } from "@/types/user";
+import api from "./axios.config";
 
 export const toggleLike = async (
   blogId: string
 ): Promise<ApiResponse<Blog>> => {
   try {
-    const response = await axios.post(
-      `http://localhost:2025/blog/like/${blogId}`,
-      {},
-      { withCredentials: true }
-    );
+    const response = await api.post(`/blog/like/${blogId}`, {});
     if (response.status === 200 && !response.data.error) {
       return {
         error: false,
@@ -45,11 +42,7 @@ export const addComment = async (
   comment: string
 ): Promise<ApiResponse<Blog>> => {
   try {
-    const response = await axios.post(
-      `http://localhost:2025/blog/comment/${blogId}`,
-      { comment },
-      { withCredentials: true }
-    );
+    const response = await api.post(`blog/comment/${blogId}`, { comment });
     if (response.status === 200 && !response.data.error) {
       return response.data;
     }
@@ -79,10 +72,7 @@ export const deleteComment = async (
   commentId: string
 ): Promise<ApiResponse<Blog>> => {
   try {
-    const response = await axios.delete(
-      `http://localhost:2025/blog/comment/${blogId}/${commentId}`,
-      { withCredentials: true }
-    );
+    const response = await api.delete(`/blog/comment/${blogId}/${commentId}`);
     if (response.status === 200 && !response.data.error) {
       return response.data;
     }
@@ -111,9 +101,7 @@ export const getOneBlog = async (
   blogId: string
 ): Promise<ApiResponse<Blog>> => {
   try {
-    const response = await axios.get(`http://localhost:2025/blog/${blogId}`, {
-      withCredentials: true,
-    });
+    const response = await api.get(`/blog/${blogId}`, {});
     if (response.status === 200 && !response.data.error) {
       return response.data;
     }
@@ -142,11 +130,10 @@ export const createBlog = async (
   data: FormData
 ): Promise<ApiResponse<Blog>> => {
   try {
-    const response = await axios.post("http://localhost:2025/blog", data, {
+    const response = await api.post("/blog", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      withCredentials: true,
     });
     if (!response.data.error) {
       throw new ApiError(response.data.message || "Failed create Blog", true);
@@ -177,11 +164,7 @@ export const deleteBlog = async (
   blogID: string
 ): Promise<ApiResponse<Blog>> => {
   try {
-    const response = await axios.post(
-      `http://localhost:2025/blog/${blogID}`,
-      {},
-      { withCredentials: true }
-    );
+    const response = await api.post(`/blog/${blogID}`, {});
     if (response.status === 200 && !response.data.error) {
       return response.data;
     }
@@ -207,9 +190,7 @@ export const deleteBlog = async (
 
 export const fetchUserProfile = async (): Promise<ApiResponse<User>> => {
   try {
-    const response = await axios.get("http://localhost:2025/user/profile", {
-      withCredentials: true,
-    });
+    const response = await api.get("/user/profile", {});
     if (response.status === 200 && !response.data.error) {
       return response.data;
     } else {
@@ -243,11 +224,7 @@ export const UpdateUserProfile = async (data: {
   avatar: File;
 }): Promise<ApiResponse<User>> => {
   try {
-    const response = await axios.patch(
-      "http://localhost:2025/user/profile",
-      { updates: data },
-      { withCredentials: true }
-    );
+    const response = await api.patch("/user/profile", { updates: data });
     if (response.status === 200 && !response.data.error) return response.data;
     else {
       throw new ApiError(
