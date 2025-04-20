@@ -10,6 +10,8 @@ const { authorization } = require('./middleware/authMiddleware.js');
 const AuthRoute = require('./routes/AuthRoute.js');
 const UserRoute = require('./routes/UserRoute.js');
 const blogRoute = require('./routes/BlogRoute.js');
+const socketServer = require('./socketServer.js');
+const httpServer = require('http').createServer(app)
 
 
 app.use(express.json())
@@ -46,7 +48,8 @@ app.put('*', (req, res) => {
 const startServer = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URL).then((database) => {
-            app.listen(process.env.PORT, () => {
+            httpServer.listen(process.env.PORT, () => {
+                socketServer(httpServer);
                 console.log("database connected & server running on port", process.env.PORT);
             })
 
