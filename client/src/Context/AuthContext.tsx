@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { ApiResponse } from "@/types/api-response";
 import { AuthError } from "@/types/error";
+import api from "@/utility/axios.config";
 
 // Create context with a default value of null
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -31,7 +32,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (user) {
             return;
         }
-        axios.get<ApiResponse<User>>("http://localhost:2025/user/me", { withCredentials: true })
+        api.get<ApiResponse<User>>("/me",)
             .then((res) => {
                 if (res.data.error) {
                     setUser(null);
@@ -69,7 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const login = async (email: string, password: string): Promise<LoginResponse> => {
         try {
-            const res = await axios.post<ApiResponse<User>>("http://localhost:2025/user/login", { emailOrUsername: email, password }, { withCredentials: true });
+            const res = await api.post<ApiResponse<User>>("/login", { emailOrUsername: email, password },);
             if (res.data.error) {
                 return res.data;
             }
@@ -96,10 +97,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Logout function
     const logout = async (): Promise<void> => {
         try {
-            const res = await axios.post<ApiResponse<null>>(
-                "http://localhost:2025/user/logout",
+            const res = await api.post<ApiResponse<null>>(
+                "logout",
                 {},
-                { withCredentials: true }
             );
 
 
