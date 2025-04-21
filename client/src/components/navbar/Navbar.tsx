@@ -27,7 +27,7 @@ const BottomNavbar: React.FC = () => {
 
                 </div>
                 <div className='flex items-center justify-center'>
-                    <Link href={'/profile'}>  <FaMessage className='h-24 text-2xl' /></Link>
+                    <Link href={'/message'}>  <FaMessage className='h-24 text-2xl' /></Link>
                 </div>
 
             </div>
@@ -54,7 +54,7 @@ const TopNavbar: React.FC = () => {
 
                     </div>
                     <div className='hidden lg:flex items-center justify-center'>
-                        <Link href={'/profile'}>  <FaMessage className='h-24 w-[30%] text-2xl' /></Link>
+                        <Link href={'/message'}>  <FaMessage className='h-24 w-[30%] text-2xl' /></Link>
                     </div>
                     <Link href={'/profile'}>  <FaUserCircle className='cursor-pointer  text-3xl' /></Link>
                     <LogoutButton />
