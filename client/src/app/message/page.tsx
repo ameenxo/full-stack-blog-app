@@ -1,13 +1,13 @@
 
 
-import MessageHome from '@/components/messageComponenets/MessageHome'
+// import MessageHome from '@/components/messageComponenets/MessageHome'
 import { SocketProvider } from '@/Context/SocketContext'
 import React from 'react'
 
 function MessagePage() {
     return (
         <SocketProvider>
-            <MessageHome />
+            {/* <MessageHome /> */}
         </SocketProvider>
     )
 }
