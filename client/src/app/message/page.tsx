@@ -1,15 +1,11 @@
-
-
-// import MessageHome from '@/components/messageComponenets/MessageHome'
-import { SocketProvider } from '@/Context/SocketContext'
 import React from 'react'
 
-function MessagePage() {
+function Message() {
     return (
-        <SocketProvider>
-            {/* <MessageHome /> */}
-        </SocketProvider>
+        <div className="h-screen flex items-center justify-center ">
+            <div className='font-extrabold'>Message component</div>
+        </div>
     )
 }
 
-export default MessagePage
+export default Message

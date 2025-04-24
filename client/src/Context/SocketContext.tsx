@@ -4,37 +4,36 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "./AuthContext"; // or wherever your user context is
 
-interface ServerToClientEvents {
-    receiveMessage: (msg: string) => void;
-    // add more if needed
-}
-interface ClientToServerEvents {
-    sendMessage: (msg: string) => void;
-    // add more if needed
-}
+
 interface SocketProviderProps {
     children: ReactNode;
 }
-type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents> | null;
 
-const SocketContext = createContext<TypedSocket | null>(null);
+const SocketContext = createContext<Socket | null>(null);
 
 export const SocketProvider = ({ children }: SocketProviderProps) => {
     const { user } = useAuth()
-    const [socket, setSocket] = useState<TypedSocket | null>(null);
+    const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
-        if (user) {
-            const socketInstance = io(process.env.NEXT_PUBLIC_SERVER_API_URL, {
+        if (user && !socket) {
+            const newSocket = io(process.env.NEXT_PUBLIC_SERVER_API_URL, {
                 withCredentials: true,
                 transports: ["websocket"],
+                query: { userId: user._id }
+            });
+            newSocket.on("connect", () => {
+                console.log("Socket connected:", newSocket.id);
+            });
+            newSocket.on("disconnect", () => {
+                console.log("Socket disconnected");
             });
 
-            setSocket(socketInstance);
+            setSocket(newSocket);
             return () => {
-                socketInstance.disconnect();
-                setSocket(null);
+                newSocket.disconnect();
             };
+
         }
     }, [user]);
 

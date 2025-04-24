@@ -5,6 +5,7 @@ import "./globals.css";
 import { AuthProvider } from "@/Context/AuthContext";
 import Navbar from "@/components/navbar/Navbar";
 import { BlogProvider } from "@/Context/BlogContext";
+import { SocketProvider } from "@/Context/SocketContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,10 +39,12 @@ export default function RootLayout({
       >
         <AuthProvider>
           <BlogProvider>
-            <div>
-              <Navbar />
-              {children}
-            </div>
+            <SocketProvider>
+              <div>
+                <Navbar />
+                {children}
+              </div>
+            </SocketProvider>
           </BlogProvider>
         </AuthProvider>
       </body>
