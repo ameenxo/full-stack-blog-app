@@ -17,7 +17,6 @@ module.exports = (httpServer) => {
             socket.disconnect(); // force disconnect
             return;
         }
-        socket.
         onlineUsers.set(userId, socket.id);
         console.log("users: ", onlineUsers);
         socket.on('disconnect', (socket) => {

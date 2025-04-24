@@ -13,8 +13,8 @@ async function getAvatarImageFile(userId) {
         return { error: true, message: error.message, fileName: null }
     }
 }
-export const getAllUsersExceptLoggedIn = (loggedInUserId) => {
+function getAllUsersExceptLoggedIn(loggedInUserId) {
     return User.find({ _id: { $ne: loggedInUserId } })
         .select("_id avatar username email") // only include these fields
         .lean(); // returns plain JS objects, faster if no mongoose methods needed
-}; module.exports = { getAvatarImageFile }
+}; module.exports = { getAvatarImageFile, getAllUsersExceptLoggedIn }
