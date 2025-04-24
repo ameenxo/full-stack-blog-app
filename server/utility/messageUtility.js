@@ -1,10 +1,10 @@
 const Message = require('../models /userModel');
 
-export const createMessage = (senderId, receiverId, text) => {
+function createMessage(senderId, receiverId, text) {
     const newMessage = new Message({ sender: senderId, receiver: receiverId, text });
     return newMessage.save();
 };
-export const getMessagesBetweenUsers = (user1Id, user2Id) => {
+function getMessagesBetweenUsers(user1Id, user2Id) {
     return Message.find({
         $or: [
             { sender: user1Id, receiver: user2Id },
@@ -12,7 +12,7 @@ export const getMessagesBetweenUsers = (user1Id, user2Id) => {
         ],
     }).sort({ createdAt: 1 });
 };
-export const markMessagesAsSeen = (senderId, receiverId) => {
+function markMessagesAsSeen(senderId, receiverId) {
     return Message.updateMany(
         {
             sender: senderId,
@@ -22,7 +22,7 @@ export const markMessagesAsSeen = (senderId, receiverId) => {
         { $set: { seen: true } }
     );
 };
-export const deleteMessage = (messageId, userId) => {
+function deleteMessage(messageId, userId) {
     return Message.findById(messageId)
         .then((message) => {
             if (!message) throw new Error("Message not found");
@@ -32,3 +32,4 @@ export const deleteMessage = (messageId, userId) => {
             return Message.findByIdAndDelete(messageId);
         });
 };
+module.exports = { getMessagesBetweenUsers, markMessagesAsSeen, deleteMessage, createMessage }
