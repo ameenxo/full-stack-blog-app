@@ -11,6 +11,7 @@ const AuthRoute = require('./routes/AuthRoute.js');
 const UserRoute = require('./routes/UserRoute.js');
 const blogRoute = require('./routes/BlogRoute.js');
 const socketServer = require('./socketServer.js');
+const MessageRoute = require('./routes/MessageRoute.js');
 const httpServer = require('http').createServer(app)
 
 
@@ -23,6 +24,7 @@ app.use(cookieParser())
 app.use('/', AuthRoute)
 app.use('/user', authorization, UserRoute);
 app.use('/blog', authorization, blogRoute);
+app.use('/messages', authorization, MessageRoute);
 app.use('/images', authorization, express.static(path.join(__dirname, 'images')));
 app.use(express.urlencoded({
     extended: true
