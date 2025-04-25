@@ -42,6 +42,52 @@ MessageRoute.get('/unread', async (req, res) => {
         return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
     }
 });
+MessageRoute.get('/recent', async (req, res) => {
+    try {
+        const recentMessages = await Message.find({
+            $or: [
+                { sender: req.user._id }, // sent messages (always included)
+                {
+                    receiver: req.user._id,
+                    isRead: true, // only include read messages from others
+                }
+            ]
+        })
+            .sort({ timestamp: -1 })
+            .populate('sender', 'username avatar')
+            .populate('receiver', 'username avatar')
+
+        if (!recentMessages || recentMessages.length === 0) {
+            throw new CustomError('recent  messages not found', 404, "request failed")
+        }
+        const recentMap = new Map();
+
+        recentChat.forEach(msg => {
+            const isSender = msg.sender._id.toString() === req.user_id;
+            const otherUser = isSender ? msg.receiver : msg.sender;
+            const otherUserId = otherUser._id.toString();
+
+            if (!recentMap.has(otherUserId)) {
+                recentMap.set(otherUserId, {
+                    userId: otherUserId,
+                    username: otherUser.username,
+                    avatar: otherUser.avatar,
+                    lastMessage: {
+                        text: msg.text,
+                        timestamp: msg.timestamp,
+                        isSender // Add this flag
+                    }
+                });
+            }
+
+        });
+        const recentChat = Array.from(recentMap.values());
+        return sendResponse(res, 200, false, "fetched recent chat ", recentChat)
+    } catch (error) {
+        return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
+    }
+
+})
 MessageRoute.get('/users', (req, res) => {
     try {
 
