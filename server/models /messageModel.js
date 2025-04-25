@@ -5,28 +5,27 @@ const messageSchema = new mongoose.Schema(
     {
         sender: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "user",
             required: true,
         },
         receiver: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "user",
             required: true,
         },
         text: {
             type: String,
             required: true,
         },
-        seen: {
+        isRead: {
             type: Boolean,
             default: false,
         },
+        timestamp: { type: Date, default: Date.now },
     },
-    {
-        timestamps: true,
-    }
+
 );
 
 const Message = mongoose.model("Message", messageSchema);
+module.exports = Message;
 
-export default Message;

@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Message = require('../models /userModel');
 
 function createMessage(senderId, receiverId, text) {
@@ -32,4 +33,11 @@ function deleteMessage(messageId, userId) {
             return Message.findByIdAndDelete(messageId);
         });
 };
+// not working properly need to fix later
+// function getUnreadMessages(userId) {
+//     return Message.find({
+//         receiver: userId,
+//         isRead: false,
+//     }).sort({ timestamp: -1 }).populate('sender', 'username avatar');
+// }
 module.exports = { getMessagesBetweenUsers, markMessagesAsSeen, deleteMessage, createMessage }

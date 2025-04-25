@@ -1,15 +1,45 @@
 const express = require('express');
-const { getMessagesBetweenUsers } = require('../utility/messageUtility');
+const { getMessagesBetweenUsers, getUnreadMessages } = require('../utility/messageUtility');
 const CustomError = require('../utility/customError');
 const sendResponse = require('../utility/sendResponse');
+const Message = require('../models /messageModel');
 
 const MessageRoute = express.Router();
 
-MessageRoute.get('recent', (req, res) => {
+MessageRoute.get('/unread', async (req, res) => {
     try {
+        const grouped = {}
+        const unreadMessages = await Message.find({
+            receiver: req.user._id,
+            isRead: false,
+        }).sort({ timestamp: -1 }).populate('sender', 'username avatar');
+
+        if (!unreadMessages || unreadMessages.length === 0) {
+            throw new CustomError('Unread messages not found', 404, 'Request failed');
+        }
+        unreadMessages.forEach(msg => {
+            const senderId = msg.sender._id.toString();
+
+            if (!grouped[senderId]) {
+                grouped[senderId] = {
+                    senderId,
+                    username: msg.sender.username,
+                    avatar: msg.sender.avatar,
+                    count: 1,
+                    lastMessage: {
+                        text: msg.text,
+                        timestamp: msg.timestamp,
+                    }
+                };
+            } else {
+                grouped[senderId].count += 1;
+            }
+        });
+        const result = Object.values(grouped);
+        return sendResponse(res, 200, false, "fetched unread message", result)
 
     } catch (error) {
-
+        return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
     }
 });
 MessageRoute.get('/users', (req, res) => {
