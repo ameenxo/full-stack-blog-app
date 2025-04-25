@@ -3,6 +3,7 @@ const { getMessagesBetweenUsers, getUnreadMessages } = require('../utility/messa
 const CustomError = require('../utility/customError');
 const sendResponse = require('../utility/sendResponse');
 const Message = require('../models /messageModel');
+const User = require('../models /userModel');
 
 const MessageRoute = express.Router();
 
@@ -88,10 +89,15 @@ MessageRoute.get('/recent', async (req, res) => {
     }
 
 })
-MessageRoute.get('/users', (req, res) => {
+MessageRoute.get('/users', async (req, res) => {
     try {
-
+        const allOtherUsers = await User.find({ _id: { $ne: req.user._id } }).select('_id avatar username')
+        if (!allOtherUsers || allOtherUsers.length === 0) {
+            throw new CustomError('other users not found ', 404, "request failed ")
+        }
+        return sendResponse(res, 200, false, "all other users data fetched", allOtherUsers)
     } catch (error) {
+        return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
 
     }
 })
