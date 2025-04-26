@@ -25,11 +25,22 @@ module.exports = (httpServer) => {
                 const newMessage = (await Message.create({ sender: senderId, receiver: receiverId, text: text, timestamp: Date.now(), isRead: false })).save()
                 if (onlineUsers.has(receiverId)) {
                     const receiverSocketId = onlineUsers.get(receiverId);
-                    io.to(receiverSocketId).emit("receiveMessage", newMessage);
+                    const senderUser = await User.findById(senderId).select("username avatar");
+                    const payload = {
+                        senderId: senderId,
+                        username: senderUser.username,
+                        avatar: senderUser.avatar,
+                        count: 1,
+                        lastMessage: {
+                            text: newMessage.text,
+                            timestamp: newMessage.timestamp,
+                        }
+                    }
+                    io.to(receiverSocketId).emit("receiveMessage", payload);
                 }
-                callback({ success: true, message: "Message sent", data: newMessage });
+                callback({ success: true, message: "Message sent successfully" });
             } catch (error) {
-                callback({ success: false, message: "Failed to send message", error: error.message });
+                callback({ success: false, message: "Failed to send message" });
             }
         });
 
