@@ -88,6 +88,25 @@ MessageRoute.get('/recent', async (req, res) => {
         return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
     }
 
+});
+MessageRoute.get('/history/:id', async (req, res) => {
+    try {
+        if (!req.params.id) {
+            throw new CustomError('user id is not valid ', 402, 'bad request')
+        }
+        const chatHistory = await Message.find({
+            $or: [
+                { sender: req.user._id, receiver: req.params.id },
+                { sender: req.params.id, receiver: req.user._id }
+            ]
+        }).sort({ timestamp: -1 })
+        if (!chatHistory || chatHistory.length === 0) {
+            throw new CustomError('cannot find any chats ', 404, "bad request ")
+        }
+        return sendResponse(res, 200, false, "fetched all chat history", chatHistory)
+    } catch (error) {
+        return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
+    }
 })
 MessageRoute.get('/users', async (req, res) => {
     try {
