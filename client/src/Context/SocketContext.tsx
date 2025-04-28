@@ -3,6 +3,7 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "./AuthContext"; // or wherever your user context is
+import { RecentChatUser } from "@/types/message/recentChatUserType";
 
 
 
@@ -23,6 +24,8 @@ interface SocketContextType {
     socket: Socket | null;
     sendMessage: (receiverId: string, text: string, callback: (response: { success: boolean; message?: string }) => void) => void;
     receivedMessage: ReceivedMessageType | null;
+    selectedUser: RecentChatUser | null;
+    setSelectedUser: (user: ReceivedMessageType | null) => void
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -30,6 +33,7 @@ const SocketContext = createContext<SocketContextType | null>(null);
 export const SocketProvider = ({ children }: SocketProviderProps) => {
     const { user } = useAuth()
     const [socket, setSocket] = useState<Socket | null>(null);
+    const [selectedUser, setSelectedUser] = useState<RecentChatUser | null>(null)
     const [receivedMessage, setReceivedMessage] = useState<ReceivedMessageType | null>(null)
     const isListenerSet = useRef(false);
 
@@ -72,6 +76,9 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
         socket,
         sendMessage,
         receivedMessage,
+        selectedUser: selectedUser,
+        setSelectedUser: setSelectedUser
+
     };
     return (
         <SocketContext.Provider value={value}>
