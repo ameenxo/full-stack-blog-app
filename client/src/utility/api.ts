@@ -255,7 +255,7 @@ export const UpdateUserProfile = async (data: {
 
 export async function fetchChatHistory(
   userId: string
-): Promise<ApiResponse<ChatMessage>> {
+): Promise<ApiResponse<ChatMessage[]>> {
   try {
     const response = await api.get(`/messages/history/${userId}`);
     if (response.status === 200 && !response.data.error) {
@@ -284,7 +284,7 @@ export async function fetchChatHistory(
   }
 }
 export async function fetchUnReadMassages(): Promise<
-  ApiResponse<RecentChatUser>
+  ApiResponse<RecentChatUser[]>
 > {
   try {
     const response = await api.get(`/messages/unread`);
@@ -315,7 +315,7 @@ export async function fetchUnReadMassages(): Promise<
   }
 }
 export async function fetchRecentMassages(): Promise<
-  ApiResponse<RecentChatUser>
+  ApiResponse<RecentChatUser[]>
 > {
   try {
     const response = await api.get(`/messages/recent`);
