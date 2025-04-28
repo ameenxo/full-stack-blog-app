@@ -14,7 +14,7 @@ function Message() {
     if (!socket) return <AuthError error={"socket not connected successfully"} />
 
     return (
-        <div className='bg-green-400 flex pt-16 min-h-screen items-center justify-center'>
+        <div className=' flex pt-16 min-h-screen items-center justify-center'>
             <div className="w-full h-full md:w-[30%] border-r overflow-y-auto">
                 <LeftSideBar />
             </div>
