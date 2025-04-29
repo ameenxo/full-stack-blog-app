@@ -1,4 +1,4 @@
-import { RecentChatUser } from '@/types/message/recentChatUserType';
+import { RecentChatUser } from '@/types/message/chatUserType';
 import { fetchRecentMassages } from '@/utility/api';
 import React, { useEffect, useState } from 'react'
 import ListUserMessage from '../listUserMessage/ListUserMessage';

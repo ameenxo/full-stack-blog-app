@@ -3,7 +3,7 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "./AuthContext"; // or wherever your user context is
-import { RecentChatUser } from "@/types/message/recentChatUserType";
+import {RecentChatUser } from "@/types/message/chatUserType";
 
 
 

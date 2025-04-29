@@ -1,5 +1,5 @@
 import { useSocket } from "@/Context/SocketContext"
-import { RecentChatUser } from "@/types/message/recentChatUserType"
+import { RecentChatUser } from "@/types/message/chatUserType"
 
 
 function ListUserMessage({ message }: { message: RecentChatUser }) {

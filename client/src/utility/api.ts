@@ -5,7 +5,7 @@ import { Blog } from "@/types/blog";
 import { User } from "@/types/user";
 import api from "./axios.config";
 import { ChatMessage } from "@/types/message/chatMessageType";
-import { RecentChatUser } from "@/types/message/recentChatUserType";
+import { RecentChatUser } from "@/types/message/chatUserType";
 
 export const toggleLike = async (
   blogId: string

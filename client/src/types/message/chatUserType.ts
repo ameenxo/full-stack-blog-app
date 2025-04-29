@@ -6,5 +6,14 @@ export interface RecentChatUser {
   lastMessage: {
     text: string;
     timestamp: string;
+    isSender: boolean;
   };
+  unreadCount: number;
+}
+
+export interface NewChatUser {
+  _id: string;
+  username: string;
+  bio: string;
+  avatar: string;
 }
