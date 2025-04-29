@@ -6,7 +6,7 @@ import OtherUserList from '../otherUserList/OtherUserList'
 function LeftSideBar() {
     
     return (
-        <div>
+        <div className='border-4 p-5 h-full'> 
             <UnReadList />
             <RecentList />
             <OtherUserList />

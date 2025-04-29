@@ -5,7 +5,7 @@ import ChatInput from '../chatInput/ChatInput'
 
 function RightChatArea() {
     return (
-        <div>
+        <div className='p-4 border-4 min-h-[80%]'>
             <ChatHeader />
             <div className="flex-1 overflow-y-auto">
                 <ChatMessages />
