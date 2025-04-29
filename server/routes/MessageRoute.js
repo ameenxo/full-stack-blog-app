@@ -7,88 +7,107 @@ const User = require('../models /userModel');
 
 const MessageRoute = express.Router();
 
-MessageRoute.get('/unread', async (req, res) => {
-    try {
-        const grouped = {}
-        const unreadMessages = await Message.find({
-            receiver: req.user._id,
-            isRead: false,
-        }).sort({ timestamp: -1 }).populate('sender', 'username avatar');
+// MessageRoute.get('/unread', async (req, res) => {
+//     try {
+//         const grouped = {}
+//         const unreadMessages = await Message.find({
+//             receiver: req.user._id,
+//             isRead: false,
+//         }).sort({ timestamp: -1 }).populate('sender', 'username avatar');
 
-        if (!unreadMessages || unreadMessages.length === 0) {
-            throw new CustomError('Unread messages not found', 404, 'Request failed');
-        }
-        unreadMessages.forEach(msg => {
-            const senderId = msg.sender._id.toString();
+//         if (!unreadMessages || unreadMessages.length === 0) {
+//             throw new CustomError('Unread messages not found', 404, 'Request failed');
+//         }
+//         unreadMessages.forEach(msg => {
+//             const senderId = msg.sender._id.toString();
 
-            if (!grouped[senderId]) {
-                grouped[senderId] = {
-                    senderId,
-                    username: msg.sender.username,
-                    avatar: msg.sender.avatar,
-                    count: 1,
-                    lastMessage: {
-                        text: msg.text,
-                        timestamp: msg.timestamp,
-                    }
-                };
-            } else {
-                grouped[senderId].count += 1;
-            }
-        });
-        const result = Object.values(grouped);
-        return sendResponse(res, 200, false, "fetched unread message", result)
+//             if (!grouped[senderId]) {
+//                 grouped[senderId] = {
+//                     senderId,
+//                     username: msg.sender.username,
+//                     avatar: msg.sender.avatar,
+//                     count: 1,
+//                     lastMessage: {
+//                         text: msg.text,
+//                         timestamp: msg.timestamp,
+//                     }
+//                 };
+//             } else {
+//                 grouped[senderId].count += 1;
+//             }
+//         });
+//         const result = Object.values(grouped);
+//         return sendResponse(res, 200, false, "fetched unread message", result)
 
-    } catch (error) {
-        return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
-    }
-});
+//     } catch (error) {
+//         return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
+//     }
+// });
 MessageRoute.get('/recent', async (req, res) => {
     try {
-        const recentMessages = await Message.find({
+        const messages = await Message.find({
             $or: [
-                { sender: req.user._id }, // sent messages (always included)
-                {
-                    receiver: req.user._id,
-                    isRead: true, // only include read messages from others
-                }
+                { sender: req.user._id },
+                { receiver: req.user._id }
             ]
         })
-            .sort({ timestamp: -1 })
+            .sort({ timestamp: -1 }) // sort latest first
             .populate('sender', 'username avatar')
-            .populate('receiver', 'username avatar')
+            .populate('receiver', 'username avatar');
 
-        if (!recentMessages || recentMessages.length === 0) {
+
+        if (!messages || messages.length === 0) {
             throw new CustomError('recent  messages not found', 404, "request failed")
         }
-        const recentMap = new Map();
+        const chatMap = new Map();
 
-        recentChat.forEach(msg => {
-            const isSender = msg.sender._id.toString() === req.user_id;
+        messages.forEach(msg => {
+            const isSender = msg.sender._id.toString() === req.user._id;
             const otherUser = isSender ? msg.receiver : msg.sender;
             const otherUserId = otherUser._id.toString();
 
-            if (!recentMap.has(otherUserId)) {
-                recentMap.set(otherUserId, {
+            if (!chatMap.has(otherUserId)) {
+                chatMap.set(otherUserId, {
                     userId: otherUserId,
                     username: otherUser.username,
                     avatar: otherUser.avatar,
                     lastMessage: {
                         text: msg.text,
                         timestamp: msg.timestamp,
-                        isSender // Add this flag
-                    }
+                        isSender: isSender
+                    },
+                    unreadCount: 0
                 });
+            }
+            if (!isSender && !msg.isRead) {
+                const chat = chatMap.get(otherUserId);
+                chat.unreadCount += 1;
             }
 
         });
-        const recentChat = Array.from(recentMap.values());
-        return sendResponse(res, 200, false, "fetched recent chat ", recentChat)
+
+        const chatList = Array.from(chatMap.values());
+        return sendResponse(res, 200, false, "fetched recent chat ", chatList)
     } catch (error) {
         return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
     }
 
 });
+MessageRoute.put("/markAsRead/:id", async (req, res) => {
+    try {
+        const result = await Message.updateMany(
+            {
+                sender: req.params.id,
+                receiver: req.user._id,
+                isRead: false
+            },
+            { $set: { isRead: true } }
+        );
+        return sendResponse(res, 200, false, "read state updated successfully")
+    } catch (error) {
+        sendResponse(res, error.statusCode || 500, true, error.message || 'internal server error')
+    }
+})
 MessageRoute.get('/history/:id', async (req, res) => {
     try {
         if (!req.params.id) {
@@ -110,7 +129,7 @@ MessageRoute.get('/history/:id', async (req, res) => {
 })
 MessageRoute.get('/users', async (req, res) => {
     try {
-        const allOtherUsers = await User.find({ _id: { $ne: req.user._id } }).select('_id avatar username')
+        const allOtherUsers = await User.find({ _id: { $ne: req.user._id } }).select('_id avatar username bio')
         if (!allOtherUsers || allOtherUsers.length === 0) {
             throw new CustomError('other users not found ', 404, "request failed ")
         }
