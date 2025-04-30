@@ -1,19 +1,13 @@
-export interface RecentChatUser {
-  userId: string;
-  username: string;
-  avatar: string;
-  count: number;
-  lastMessage: {
-    text: string;
-    timestamp: string;
-    isSender: boolean;
-  };
-  unreadCount: number;
+export interface ChatUserLastMessage {
+  text: string;
+  timestamp: string; // or Date, depending on your usage
 }
 
-export interface NewChatUser {
+export interface ChatUser {
   _id: string;
   username: string;
-  bio: string;
   avatar: string;
+  bio: string;
+  lastMessage: ChatUserLastMessage | null;
+  unreadCount: number;
 }
