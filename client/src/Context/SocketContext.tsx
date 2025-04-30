@@ -3,7 +3,7 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "./AuthContext"; // or wherever your user context is
-import {RecentChatUser } from "@/types/message/chatUserType";
+import { NewChatUser, RecentChatUser } from "@/types/message/chatUserType";
 
 
 
@@ -24,8 +24,8 @@ interface SocketContextType {
     socket: Socket | null;
     sendMessage: (receiverId: string, text: string, callback: (response: { success: boolean; message?: string }) => void) => void;
     receivedMessage: ReceivedMessageType | null;
-    selectedUser: RecentChatUser | null;
-    setSelectedUser: (user: ReceivedMessageType | null) => void
+    selectedUser: RecentChatUser | NewChatUser | null;
+    setSelectedUser: React.Dispatch<React.SetStateAction<RecentChatUser | NewChatUser | null>>;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -33,7 +33,7 @@ const SocketContext = createContext<SocketContextType | null>(null);
 export const SocketProvider = ({ children }: SocketProviderProps) => {
     const { user } = useAuth()
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [selectedUser, setSelectedUser] = useState<RecentChatUser | null>(null)
+    const [selectedUser, setSelectedUser] = useState<RecentChatUser | NewChatUser | null>(null)
     const [receivedMessage, setReceivedMessage] = useState<ReceivedMessageType | null>(null)
     const isListenerSet = useRef(false);
 
@@ -62,6 +62,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
         if (socket && !isListenerSet.current) {
             socket.on("receiveMessage", (message: ReceivedMessageType) => {
                 console.log("New message received:", message);
+                alert("new message received")
                 setReceivedMessage(message);
             });
             isListenerSet.current = true;

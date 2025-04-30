@@ -1,5 +1,5 @@
 export interface RecentChatUser {
-  senderId: string;
+  userId: string;
   username: string;
   avatar: string;
   count: number;

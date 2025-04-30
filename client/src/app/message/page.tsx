@@ -14,14 +14,16 @@ function Message() {
     if (!socket) return <AuthError error={"socket not connected successfully"} />
 
     return (
-        <div className=' flex pt-16 min-h-screen items-center justify-center border-2'>
-            <div className="w-full h-full md:w-[30%] border-r overflow-y-auto border-2">
+        <div className=' flex p-10 pt-16 h-screen items-center justify-center gap-2'>
+            <div className="w-full  h-[80%] md:w-[30%] border-2 overflow-y-auto ">
                 <LeftSideBar />
             </div>
-            <div className="hidden h-[80%] md:flex flex-col w-[70%] border-2">
+            <div className="hidden h-[80%] md:flex flex-col w-[70%]">
                 <RightChatArea />
             </div>
+
         </div>
+
     )
 }
 

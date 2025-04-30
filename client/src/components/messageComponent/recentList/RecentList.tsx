@@ -16,12 +16,13 @@ function RecentList() {
         fetchUnreadUsers();
     }, []);
     return (
-        <>
+        <div className='flex flex-col gap-2'>
             <div>recent messages</div>
             {recentUserMessages.map((obj, index) => {
-                return <ListUserMessage message={obj} key={index} />
+                return <ListUserMessage messageInfo={obj} key={index} />
             })}
-        </>
+
+        </div>
     )
 }
 
