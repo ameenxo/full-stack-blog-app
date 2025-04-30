@@ -5,7 +5,7 @@ import { Blog } from "@/types/blog";
 import { User } from "@/types/user";
 import api from "./axios.config";
 import { ChatMessage } from "@/types/message/chatMessageType";
-import { RecentChatUser } from "@/types/message/chatUserType";
+import { ChatUser } from "@/types/message/chatUserType";
 
 export const toggleLike = async (
   blogId: string
@@ -283,40 +283,8 @@ export async function fetchChatHistory(
     };
   }
 }
-export async function fetchUnReadMassages(): Promise<
-  ApiResponse<RecentChatUser[]>
-> {
-  try {
-    const response = await api.get(`/messages/unread`);
-    if (response.status === 200 && !response.data.error) {
-      return response.data;
-    }
-    throw new ApiError(
-      response.data.message || "failed to fetch unread messages",
-      true
-    );
-  } catch (error) {
-    if (error instanceof ApiError) {
-      return {
-        error: true,
-        message: error.message,
-      };
-    } else if (axios.isAxiosError(error)) {
-      return {
-        error: true,
-        message:
-          error.response?.data.message || "failed to fetch unread messages ",
-      };
-    }
-    return {
-      error: true,
-      message: "An unexpected error occurred when fetching  unread messages",
-    };
-  }
-}
-export async function fetchRecentMassages(): Promise<
-  ApiResponse<RecentChatUser[]>
-> {
+
+export async function fetchRecentMassages(): Promise<ApiResponse<ChatUser[]>> {
   try {
     const response = await api.get(`/messages/recent`);
     if (response.status === 200 && !response.data.error) {
@@ -336,12 +304,51 @@ export async function fetchRecentMassages(): Promise<
       return {
         error: true,
         message:
-          error.response?.data.message || "failed to fetch recent messages ",
+          error.response?.data.message ||
+          (error instanceof Error
+            ? error.message
+            : "An unexpected error occurred") ||
+          "failed to fetch recent messages ",
       };
     }
     return {
       error: true,
       message: "An unexpected error occurred when fetching recent messages",
+    };
+  }
+}
+export async function fetchUserForNewMessage(): Promise<
+  ApiResponse<ChatUser[]>
+> {
+  try {
+    const response = await api.get(`/messages/users`);
+    if (response.status === 200 && !response.data.error) {
+      return response.data;
+    }
+    throw new ApiError(
+      response.data.message || "failed to fetch users data ",
+      true
+    );
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return {
+        error: true,
+        message: error.message,
+      };
+    } else if (axios.isAxiosError(error)) {
+      return {
+        error: true,
+        message:
+          error.response?.data.message ||
+          (error instanceof Error
+            ? error.message
+            : "An unexpected error occurred") ||
+          "failed to fetch users data ",
+      };
+    }
+    return {
+      error: true,
+      message: "An unexpected error occurred when fetching users data",
     };
   }
 }
