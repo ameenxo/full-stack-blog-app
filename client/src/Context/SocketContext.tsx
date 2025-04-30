@@ -4,25 +4,7 @@ import { createContext, ReactNode, useContext, useEffect, useRef, useState } fro
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "./AuthContext"; // or wherever your user context is
 import { ChatUser } from "@/types/message/chatUserType";
-import { ChatMessage } from "@/types/message/chatMessageType";
-
-
-
-interface ReceivedMessageType {
-    from: {
-        userId: string,
-        userName: string,
-        avatar: string,
-    },
-    message: {
-        _id: string,
-        sender: string,
-        receiver: string,
-        text: string,
-        isRead: boolean,
-        timestamp: number,
-    }
-}
+import { ChatMessage, ReceivedMessageType } from "@/types/message/chatMessageType";
 
 interface SocketContextType {
     socket: Socket | null;
