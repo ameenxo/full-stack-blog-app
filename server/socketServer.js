@@ -1,5 +1,6 @@
 const { Server } = require('socket.io')
-const Message = require('./models /messageModel')
+const Message = require('./models /messageModel');
+const User = require('./models /userModel');
 module.exports = (httpServer) => {
 
     const onlineUsers = new Map();
@@ -20,27 +21,40 @@ module.exports = (httpServer) => {
         }
         onlineUsers.set(userId, socket.id);
 
-        socket.on('sendMessage', async ({ senderId, receiverId, text }) => {
+        socket.on('sendMessage', async ({ senderId, receiverId, text }, callback) => {
             try {
-                const newMessage = (await Message.create({ sender: senderId, receiver: receiverId, text: text, timestamp: Date.now(), isRead: false })).save()
+                const newMessage = await Message.create({
+                    sender: senderId,
+                    receiver: receiverId,
+                    text: text,
+                    timestamp: Date.now(),
+                    isRead: false
+                });
+                const message = {
+                    _id: newMessage._id,
+                    sender: newMessage.sender.toString(),
+                    receiver: newMessage.receiver.toString(),
+                    text: newMessage.text,
+                    isRead: newMessage.isRead,
+                    timestamp: newMessage.timestamp
+                }
                 if (onlineUsers.has(receiverId)) {
                     const receiverSocketId = onlineUsers.get(receiverId);
-                    const senderUser = await User.findById(senderId).select("username avatar");
-                    const payload = {
-                        senderId: senderId,
-                        username: senderUser.username,
-                        avatar: senderUser.avatar,
-                        count: 1,
-                        lastMessage: {
-                            text: newMessage.text,
-                            timestamp: newMessage.timestamp,
-                        }
-                    }
-                    io.to(receiverSocketId).emit("receiveMessage", payload);
+                    const senderUser = await User.findById(senderId).select(" _id username avatar");
+                    const data = {
+                        from: {
+                            userId: senderUser._id,
+                            userName: senderUser.username,
+                            avatar: senderUser.avatar
+                        },
+                        message: message,
+
+                    };
+                    io.to(receiverSocketId).emit("receiveMessage", data);
                 }
-                callback({ success: true, message: "Message sent successfully" });
+                callback({ success: true, message: "Message sent successfully", data: message });
             } catch (error) {
-                callback({ success: false, message: "Failed to send message" });
+                callback({ success: false, message: error.message || "Failed to send message" });
             }
         });
 
@@ -49,4 +63,4 @@ module.exports = (httpServer) => {
         });
     })
 
-}
+} 
