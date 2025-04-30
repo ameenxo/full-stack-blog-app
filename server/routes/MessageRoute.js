@@ -52,8 +52,8 @@ MessageRoute.get('/recent', async (req, res) => {
             ]
         })
             .sort({ timestamp: -1 }) // sort latest first
-            .populate('sender', 'username avatar')
-            .populate('receiver', 'username avatar');
+            .populate('sender', 'username avatar bio')
+            .populate('receiver', 'username avatar bio');
 
 
         if (!messages || messages.length === 0) {
@@ -68,9 +68,10 @@ MessageRoute.get('/recent', async (req, res) => {
 
             if (!chatMap.has(otherUserId)) {
                 chatMap.set(otherUserId, {
-                    userId: otherUserId,
+                    _id: otherUserId,
                     username: otherUser.username,
                     avatar: otherUser.avatar,
+                    bio: otherUser.bio,
                     lastMessage: {
                         text: msg.text,
                         timestamp: msg.timestamp,
@@ -129,11 +130,25 @@ MessageRoute.get('/history/:id', async (req, res) => {
 })
 MessageRoute.get('/users', async (req, res) => {
     try {
-        const allOtherUsers = await User.find({ _id: { $ne: req.user._id } }).select('_id avatar username bio')
-        if (!allOtherUsers || allOtherUsers.length === 0) {
-            throw new CustomError('other users not found ', 404, "request failed ")
+        const sentTo = await Message.distinct("receiver", { sender: req.user._id });
+        const receivedFrom = await Message.distinct("sender", { receiver: req.user._id });
+        const chattedUserIds = [...new Set([...sentTo, ...receivedFrom])];
+        chattedUserIds.push(req.user._id);
+        const neverChattedUsers = await User.find({
+            _id: { $nin: chattedUserIds }
+        }).select("_id username avatar bio");
+        if (!neverChattedUsers || neverChattedUsers.length === 0) {
+            throw new CustomError('not find any users', 404, "request failed")
         }
-        return sendResponse(res, 200, false, "all other users data fetched", allOtherUsers)
+        const users = neverChattedUsers.map(user => ({
+            _id: user._id,
+            username: user.username,
+            avatar: user.avatar,
+            bio: user.bio,
+            lastMessage: null,
+            unreadCount: 0
+        }));
+        return sendResponse(res, 200, false, "all other users data fetched", users)
     } catch (error) {
         return sendResponse(res, error.statusCode || 500, true, error.message || "internal server error ")
 
