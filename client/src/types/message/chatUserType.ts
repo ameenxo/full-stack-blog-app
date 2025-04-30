@@ -1,6 +1,7 @@
 export interface ChatUserLastMessage {
   text: string;
-  timestamp: string; // or Date, depending on your usage
+  timestamp: string;
+  isSender: boolean;
 }
 
 export interface ChatUser {
