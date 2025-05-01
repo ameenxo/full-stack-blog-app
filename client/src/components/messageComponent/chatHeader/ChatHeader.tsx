@@ -7,7 +7,7 @@ function ChatHeader() {
   const { selectedUser } = useSocket()
 
   if (selectedUser) {
-    return <ListUserMessage messageInfo={selectedUser} />
+    return <ListUserMessage user={selectedUser} />
   }
   return null
 }

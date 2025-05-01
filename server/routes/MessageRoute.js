@@ -119,7 +119,7 @@ MessageRoute.get('/history/:id', async (req, res) => {
                 { sender: req.user._id, receiver: req.params.id },
                 { sender: req.params.id, receiver: req.user._id }
             ]
-        }).sort({ timestamp: -1 })
+        }).sort({ timestamp: 1 })
         if (!chatHistory || chatHistory.length === 0) {
             throw new CustomError('cannot find any chats ', 404, "bad request ")
         }

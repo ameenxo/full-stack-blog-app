@@ -1,40 +1,29 @@
 "use client"
 import { useAuth } from '@/Context/AuthContext';
 import { useSocket } from '@/Context/SocketContext';
-import { ChatMessage } from '@/types/message/chatMessageType'
 import { fetchChatHistory } from '@/utility/api';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-function ChatMessages({ chatHistory, setChatHistory }: { chatHistory: ChatMessage[], setChatHistory: React.Dispatch<React.SetStateAction<ChatMessage[]>> }) {
+function ChatMessages() {
   const { user } = useAuth()
-  const { selectedUser } = useSocket()
+  const { selectedUser, setChatHistory, chatHistory } = useSocket()
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchAllChat = async () => {
       try {
-        setLoading(true)
-        console.log(selectedUser);
+        if (!selectedUser) return; // don't do anything if user is not yet selected
 
-        if (selectedUser === null) {
-          return
-        }
-        let otherUserId: string | undefined;
+        setLoading(true);
+        setError(null); // clear previous error
 
-        if ('userId' in selectedUser && typeof selectedUser.userId === 'string') {
-          otherUserId = selectedUser.userId;
-        } else if ('_id' in selectedUser && typeof selectedUser._id === 'string') {
-          otherUserId = selectedUser._id;
+        const response = await fetchChatHistory(selectedUser._id);
+        if (response.data && !response.error) {
+          return setChatHistory(response.data);
         }
-        if (!otherUserId) {
-          return setError("id is not valid")
-        }
-        const response = await fetchChatHistory(otherUserId);
-        if (response.error || !response.data) {
-          return setError(response.message)
-        } setChatHistory(response.data);
-        setError(null)
+        setError(response.message || "Failed to fetch chat");
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message);
@@ -42,11 +31,16 @@ function ChatMessages({ chatHistory, setChatHistory }: { chatHistory: ChatMessag
           setError('An unknown error occurred');
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
     fetchAllChat();
   }, [selectedUser])
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatHistory]);
 
   if (!selectedUser) return <div className="p-4 text-gray-500">No user selected</div>;
   if (loading) return <div className="p-4 text-gray-500">Loading messages...</div>;
@@ -54,7 +48,7 @@ function ChatMessages({ chatHistory, setChatHistory }: { chatHistory: ChatMessag
   if (chatHistory.length === 0) return <div className="p-4 text-gray-500">No chat history yet</div>;
 
   return (
-    <div className="p-4 space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
+    <div className="p-4 h-full space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
       {chatHistory.map((message) => {
         const isSender = message.sender === user?._id;
 
@@ -75,6 +69,7 @@ function ChatMessages({ chatHistory, setChatHistory }: { chatHistory: ChatMessag
           </div>
         );
       })}
+      <div ref={bottomRef} />
     </div>
   );
 }

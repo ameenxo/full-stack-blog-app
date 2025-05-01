@@ -18,6 +18,6 @@ export interface ReceivedMessageType {
     receiver: string;
     text: string;
     isRead: boolean;
-    timestamp: number;
+    timestamp: string;
   };
 }

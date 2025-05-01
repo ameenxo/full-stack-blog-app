@@ -9,13 +9,14 @@ import { ChatMessage, ReceivedMessageType } from "@/types/message/chatMessageTyp
 interface SocketContextType {
     socket: Socket | null;
     sendMessage: (receiverId: string, text: string, callback: (response: { success: boolean; message?: string, data?: ChatMessage }) => void) => void;
-    receivedMessage: ReceivedMessageType | null;
     selectedUser: ChatUser | null;
     setSelectedUser: React.Dispatch<React.SetStateAction<ChatUser | null>>;
     chatUsers: ChatUser[];
     setChatUsers: React.Dispatch<React.SetStateAction<ChatUser[]>>;
     chatHistory: ChatMessage[];
     setChatHistory: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+    otherUsers: ChatUser[];
+    setOtherUsers: React.Dispatch<React.SetStateAction<ChatUser[]>>;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -24,10 +25,11 @@ export const SocketProvider = ({ children }: { children: ReactNode; }) => {
     const { user } = useAuth()
     const [socket, setSocket] = useState<Socket | null>(null);
     const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null)
-    const [receivedMessage, setReceivedMessage] = useState<ReceivedMessageType | null>(null);
     const [chatUsers, setChatUsers] = useState<ChatUser[]>([])
-    const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
+    const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+    const [otherUsers, setOtherUsers] = useState<ChatUser[]>([])
     const isListenerSet = useRef(false);
+    const selectedUserRef = useRef(selectedUser);
 
     useEffect(() => {
         if (user) {
@@ -51,11 +53,43 @@ export const SocketProvider = ({ children }: { children: ReactNode; }) => {
         }
     }, [user]);
     useEffect(() => {
+        selectedUserRef.current = selectedUser;
+    }, [selectedUser]);
+    useEffect(() => {
         if (socket && !isListenerSet.current) {
             socket.on("receiveMessage", (message: ReceivedMessageType) => {
                 console.log("New message received:", message);
-                alert("new message received")
-                setReceivedMessage(message);
+                const currentSelectedUser = selectedUserRef.current;
+                if (currentSelectedUser && currentSelectedUser._id === message.from.userId) {
+                    setChatHistory((prev) => [...prev, message.message]);
+                } else {
+                    setChatUsers((prevUsers) => {
+                        const existingIndex = prevUsers.findIndex(
+                            (user) => user._id === message.from.userId
+                        );
+
+                        if (existingIndex !== -1) {
+                            const updatedUser = { ...prevUsers[existingIndex] };
+                            const updatedUsers = [...prevUsers];
+                            updatedUsers.splice(existingIndex, 1);
+                            return [updatedUser, ...updatedUsers];
+                        } else {
+                            const newUser: ChatUser = {
+                                _id: message.from.userId,
+                                username: message.from.userName,
+                                avatar: message.from.avatar,
+                                bio: "", // Default value for bio
+                                lastMessage: {
+                                    isSender: false,
+                                    text: message.message.text,
+                                    timestamp: message.message.timestamp
+                                }, // Default value for lastMessage
+                                unreadCount: 1, // Default value for unreadCount
+                            };
+                            return [newUser, ...prevUsers];
+                        }
+                    });
+                }
             });
             isListenerSet.current = true;
         }
@@ -68,13 +102,14 @@ export const SocketProvider = ({ children }: { children: ReactNode; }) => {
     const value: SocketContextType = {
         socket,
         sendMessage,
-        receivedMessage,
         selectedUser: selectedUser,
         setSelectedUser: setSelectedUser,
         chatHistory: chatHistory,
         setChatHistory: setChatHistory,
         chatUsers: chatUsers,
-        setChatUsers: setChatUsers
+        setChatUsers: setChatUsers,
+        otherUsers: otherUsers,
+        setOtherUsers: setOtherUsers
 
     };
     return (
