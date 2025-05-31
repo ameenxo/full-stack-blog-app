@@ -52,7 +52,7 @@ userSchema.pre('save', async function (next) {
     this.bio = `Hey there! I'm ${this.name}. I'm excited to share my thoughts with you.`
   }
   if (!this.avatar) {
-    this.avatar = "http://localhost:2025/images/default.jpg"
+    this.avatar = "http://localhost:2025/assets/defaultAvatar.png"
   }
   next();
 })

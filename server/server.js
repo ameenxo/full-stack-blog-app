@@ -26,6 +26,7 @@ app.use('/user', authorization, UserRoute);
 app.use('/blog', authorization, blogRoute);
 app.use('/messages', authorization, MessageRoute);
 app.use('/images', authorization, express.static(path.join(__dirname, 'images')));
+app.use('/asstes', express.static(path.join(__dirname, 'assets')));
 app.use(express.urlencoded({
     extended: true
 
